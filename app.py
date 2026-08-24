@@ -31,7 +31,7 @@ if HAS_GENAI and GEMINI_API_KEY:
         model = None
 
 # =====================================================================
-# ১. ডাটাবেজ ইনিশিয়ালাইজেশন (BRAC Bank সহ)
+# ১. ডাটাবেজ ইনিশিয়ালাইজেশন
 # =====================================================================
 def initialize_production_database():
     conn = sqlite3.connect('minister_main_system.db')
@@ -69,7 +69,7 @@ def initialize_production_database():
         )
     """)
     
-    # DBBL ও BRAC Bank অ্যাকাউন্ট রেজিস্ট্রেশন
+    # ব্যাংক অ্যাকাউন্ট ডাটাবেজ
     cursor.execute("INSERT OR REPLACE INTO bank_accounts VALUES ('DBBL_MERCHANT', '103.110.39646', 500000.00)")
     cursor.execute("INSERT OR REPLACE INTO bank_accounts VALUES ('BRAC_CORP', '3101204280749001', 250000.00)")
     cursor.execute("INSERT OR REPLACE INTO bank_accounts VALUES ('BRAC_SME_OP', '2071024810001', 150000.00)")
@@ -86,7 +86,7 @@ def initialize_production_database():
     
     conn.commit()
     conn.close()
-    print("✅ ব্র্যাক ব্যাংক ও ডিবিবিএল সহ ডাটাবেজ প্রস্তুত সম্পন্ন।")
+    print("✅ ডাটাবেজ প্রস্তুত সম্পন্ন।")
 
 # =====================================================================
 # ২. ব্র্যাক ব্যাংক অফিশিয়াল পেমেন্ট স্লিপ জেনারেটর
@@ -152,7 +152,7 @@ def create_brac_bank_payment_slip(customer_code, txn_id, amount, acc_no, acc_tit
         print("💳 [এইচটিএমএল ব্যাকআপ]: 'Output_BRAC_Bank_Slip.html' সংরক্ষিত হয়েছে।")
 
 # =====================================================================
-# ৩. রিয়েল-টাইম ব্র্যাক ব্যাংক ট্রান্সফার এক্সিকিউশন ইঞ্জিন
+# ৩. রিয়েল-টাইম ব্র্যাক ব্যাংক ট্রান্সফার ইঞ্জিন
 # =====================================================================
 def execute_brac_realtime_transfer(transfer_payload):
     txn_id = transfer_payload['txn_id']
@@ -172,10 +172,10 @@ def execute_brac_realtime_transfer(transfer_payload):
     try:
         print(f"\n⚡ [BRAC Bank Real-Time Sync]: ৳{amount:,.2f} ক্রেডিট প্রসেস হচ্ছে...")
         
-        # ১. নির্দিষ্ট ব্র্যাক ব্যাংক অ্যাকাউন্টে ব্যালেন্স বৃদ্ধি
+        # ১. ব্যাংকে ব্যালেন্স যোগ
         cursor.execute("UPDATE bank_accounts SET balance = balance + ? WHERE account_name = ?", (amount, target_account))
         
-        # ২. কাস্টমার লেজার ব্যালেন্স এডজাস্টমেন্ট
+        # ২. লেজার ব্যালেন্স আপডেট
         cursor.execute("SELECT current_balance FROM customer_ledger WHERE customer_code = ? ORDER BY id DESC LIMIT 1", (customer_code,))
         old_row = cursor.fetchone()
         old_balance = float(old_row[0]) if old_row else 0.0
@@ -190,23 +190,26 @@ def execute_brac_realtime_transfer(transfer_payload):
         conn.commit()
         print(f"✅ [ট্রান্সফার সফল]: ব্র্যাক ব্যাংক A/C ({acc_no}) ব্যালেন্স আপডেট ও লেজার সিঙ্ক সম্পন্ন।")
         
-        # ৩. ব্র্যাক ব্যাংক রসিদ তৈরি
+        # ৩. স্লিপ জেনারেট
         create_brac_bank_payment_slip(customer_code, txn_id, amount, acc_no, acc_title)
         
     except Exception as e:
         conn.rollback()
-        print(f"❌ [এরর]: ট্রান্সফার ব্যর্থ, ডাটা রোলব্যাক করা হয়েছে: {e}")
+        print(f"❌ [এরর]: ট্রান্সফার ব্যর্থ: {e}")
     finally:
         conn.close()
 
+# =====================================================================
+# ৪. ৫০,০০০ টাকা ট্রান্সফার এক্সিকিউশন
+# =====================================================================
 if __name__ == "__main__":
     initialize_production_database()
     
-    # ব্র্যাক ব্যাংক রিয়েল-টাইম ট্রান্সফার টেস্ট
-    sample_transfer = {
-        "txn_id": f"ASTHA-{random.randint(100000, 999999)}",
+    transfer_50k = {
+        "txn_id": "ASTHA-589214",
         "customer_code": "DEAL002905",
-        "amount": "105843.00",
-        "target_account": "BRAC_CORP"  # অথবা "BRAC_SME_OP"
+        "amount": "50000.00",
+        "target_account": "BRAC_CORP"  # SME অ্যাকাউন্টের জন্য "BRAC_SME_OP" দিন
     }
-    execute_brac_realtime_transfer(sample_transfer)
+
+    execute_brac_realtime_transfer(transfer_50k)
