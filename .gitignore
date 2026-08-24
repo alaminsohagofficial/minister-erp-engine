@@ -1,0 +1,31 @@
+# Environment variables (API Keys and secrets)
+.env
+.env.local
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+
+# Database files
+*.db
+*.sqlite3
+
+# Generated PDF & HTML outputs (Dynamic files)
+*.pdf
+Output_Customer_Invoice.html
+Output_NexusPay_Slip.html
+Output_Statement_Of_Account.html
+
+# Operating System & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
