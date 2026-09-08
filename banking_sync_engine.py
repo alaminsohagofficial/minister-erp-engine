@@ -47,10 +47,11 @@ def home():
 
 @app.route('/api/v1/sync/verify-ledger', methods=['POST', 'GET'])
 def verify_ledger_api():
+    # Simulates real-time banking API handshake and cryptographic verification against Minister's ERP query
     req_data = request.json if request.is_json else {}
     query_id = req_data.get("query_id", "MINISTER-ERP-DISPUTE-001")
     
-    # Generate cryptographic integrity hash for absolute proof
+    # Generate cryptographic integrity hash
     ledger_signature = hashlib.sha256(str(VERIFIED_LEDGER_POOL).encode()).hexdigest()[:16]
     
     return jsonify({
@@ -66,4 +67,4 @@ def verify_ledger_api():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-  
+
