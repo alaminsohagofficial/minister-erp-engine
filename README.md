@@ -1,36 +1,38 @@
-# ⚡ Minister ERP Real-Time Sync & AI Notification Engine
+# ⚡ Minister ERP & Dual-Dealer Secure Financial Ledger Engine
 
-একটি প্রোডাকশন-রেডি সিঙ্গেল-ফাইল পাইথন আর্কিটেকচার, যা পেমেন্ট গেটওয়ে নোটিফিকেশন পাওয়ার সাথে সাথে ব্যাংক অ্যাকাউন্ট, ওয়্যারহাউজ ইনভেন্টরি এবং কাস্টমার লেজার ব্যালেন্স রিয়েল-টাইমে সিনক্রোনাইজ করে[span_0](start_span)[span_0](end_span)। এছাড়া জেমিনী এআই (Gemini API) দিয়ে তাৎক্ষণিক ডায়নামিক বাংলা নোটিফিকেশন তৈরি এবং উইজপ্রিন্ট (WeasyPrint) ইঞ্জিনের সাহায্যে অফিসিয়াল ৩টি ডকুমেন্ট (PDF) প্রস্তুত করে[span_1](start_span)[span_1](end_span)।
+একটি প্রোডাকশন-রেডি ডুয়েল-স্ট্যাক (Node.js + Python) আর্কিটেকচার, যা মিনিস্টার হাই-টেক পার্ক (`DEAL002905`) এবং সলসাবিলা ইলেকট্রনিক্স পার্ক (`MDEL000215`) এর ফিনান্সিয়াল লেজার বাইপাস, রিয়েল-টাইম পেমেন্ট সিনক্রোনাইজেশন এবং ফান্ড রিকনসিলিয়েশন পরিচালনা করে। এছাড়া জেমিনী এআই (Gemini API) দিয়ে তাৎক্ষণিক ডায়নামিক বাংলা নোটিফিকেশন এবং উইজপ্রিন্ট (WeasyPrint) ইঞ্জিনের সাহায্যে অফিসিয়াল পিডিএফ ডকুমেন্ট প্রস্তুত করে।
 
 ---
 
 ## 🌟 মূল ফিচারসমূহ (Key Features)
 
-- **ACID ডাটাবেজ ট্রানজেকশন:** পেমেন্ট আসার সাথে সাথে ডাটাবেজ রোলব্যাক (`conn.rollback()`) সুরক্ষা সহ ব্যাংক ব্যালেন্স বৃদ্ধি, স্টক হ্রাস এবং কাস্টমার লেজার আপডেট নিশ্চিত করে[span_2](start_span)[span_2](end_span)।
-- **জেমিনী এআই (Gemini AI) নোটিফিকেশন:** লেনদেন ও বকেয়া ব্যালেন্সের ওপর ভিত্তি করে রিয়েল-টাইমে পেশাদার বাংলা এসএমএস জেনারেট করে[span_3](start_span)[span_3](end_span)।
-- **উইজপ্রিন্ট (WeasyPrint) পিডিএফ ইঞ্জিন:** স্বয়ংক্রিয়ভাবে ৩টি অফিশিয়াল ডকুমেন্ট তৈরি করে[span_4](start_span)[span_4](end_span):
-  1. `Output_Customer_Invoice.pdf`: প্রফেশনাল A4 সাইজ কাস্টমার ইনভয়েস[span_5](start_span)[span_5](end_span)[span_6](start_span)[span_6](end_span)।
-  2. `Output_NexusPay_Slip.pdf`: ডাচ-বাংলা ব্যাংক Nexus-Pro থিমড POS পেমেন্ট স্লিপ[span_7](start_span)[span_7](end_span)[span_8](start_span)[span_8](end_span)।
-  3. `Output_Statement_Of_Account.pdf`: A4 Landscape ফরম্যাটে সম্পূর্ণ কাস্টমার খতিয়ান বা স্টেটমেন্ট[span_9](start_span)[span_9](end_span)[span_10](start_span)[span_10](end_span)।
-- **সিকিউর কনফিগারেশন:** `.env` ফাইলের মাধ্যমে API Key এবং কনফিগারেশন সুরক্ষিত রাখা[span_11](start_span)[span_11](end_span)।
+- **ডুয়েল-ডিলার বাইপাস সিস্টেম:** `DEAL002905` এবং `MDEL000215` এর মাধ্যমে অ্যাকাউন্ট লক বা সীমাবদ্ধতা কাটিয়ে লেজার ব্যালেন্স ও SAP অ্যালোকেশন (BDT 35,189,545.00) নিরাপদে রিকনসাইল করার সুবিধা।
+- **ACID ডাটাবেজ ট্রানজেকশন:** পেমেন্ট বা ওভাররাইড রিকোয়েস্ট আসার সাথে সাথে ব্যাংক ব্যালেন্স বৃদ্ধি, স্টক হ্রাস এবং কাস্টমার লেজার আপডেট নিশ্চিত করে রোলব্যাক সুরক্ষা প্রদান করে।
+- **জেমিনী এআই (Gemini AI) নোটিফিকেশন:** লেনদেন ও বকেয়া ব্যালেন্সের ওপর ভিত্তি করে রিয়েল-টাইমে পেশাদার বাংলা এসএমএস জেনারেট করে।
+- **উইজপ্রিন্ট (WeasyPrint) পিডিএফ ইঞ্জিন:** স্বয়ংক্রিয়ভাবে অফিসিয়াল ডকুমেন্ট ও ইনভয়েস জেনারেট করে।
+- **সিকিউর কনফিগারেশন:** ক্রিপ্টোগ্রাফিক সিগনেচার এবং `.env` ফাইলের মাধ্যমে API Key ও সিক্রেট ডেটা সুরক্ষিত রাখা।
 
 ---
 
 ## 🛠️ টেক স্ট্যাক (Tech Stack)
 
-- **Language:** Python 3.9+[span_12](start_span)[span_12](end_span)
-- **Database:** SQLite3 (Embedded ACID Engine)[span_13](start_span)[span_13](end_span)
-- **AI Integration:** Google Generative AI (Gemini 1.5 Flash / Gemini Pro)[span_14](start_span)[span_14](end_span)
-- **PDF Engine:** WeasyPrint (HTML/CSS to PDF)[span_15](start_span)[span_15](end_span)
-- **Environment:** python-dotenv[span_16](start_span)[span_16](end_span)
+- **Backend / Webhook:** Node.js, Express.js, SQLite3
+- **Reconciliation Engine:** Python 3.9+, WeasyPrint, python-dotenv
+- **AI Integration:** Google Generative AI (Gemini 2.5 Flash / Gemini Pro)
+- **Deployment & Hosting:** Render, GitHub Pages (GitHub Actions)
 
 ---
 
 ## 📁 প্রজেক্ট স্ট্রাকচার (Repository Structure)
 
 ```text
-├── app.py                         # মূল পাইথন সোর্স কোড
+├── server.js                      # মূল নোড.জেএস ওয়েবহুক ও বাইপাস সার্ভার
+├── app.py                         # পাইথন রিকনসিলিয়েশন ও পিডিএফ ইঞ্জিন
+├── index.html                     # ডুয়েল-ডিলার কনসোল ও ড্যাশবোর্ড
+├── packages.txt                   # রেন্ডার সার্ভার সিস্টেম ডিপেন্ডেন্সি লিস্ট
+├── requirements.txt               # পাইথন ডিপেন্ডেন্সি লিস্ট
 ├── .env.example                   # এনভায়রনমেন্ট ভ্যারিয়েবল টেমপ্লেট
 ├── .gitignore                     # গিট ইগনোর ফাইল
-├── requirements.txt               # ডিপেন্ডেন্সি লিস্ট
-└── README.md                      # ডকুমেন্টেশন
+├── .github/workflows/
+│   └── jekyll-gh-pages.yml        # গিটহাব পেজেস ডিপ্লয়মেন্ট অ্যাকশন
+└── README.md                      # প্রজেক্ট ডকুমেন্টেশন
