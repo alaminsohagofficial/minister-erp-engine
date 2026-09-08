@@ -1,3 +1,5 @@
-weasyprint
+flask
+gunicorn
 google-generativeai
+weasyprint
 python-dotenv
