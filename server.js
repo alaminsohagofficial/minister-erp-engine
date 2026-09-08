@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -17,12 +17,21 @@ const db = new sqlite3.Database('./minister_main_system.db', (err) => {
     }
 });
 
-// ২. জেমিনী এআই কনফিগারেশন
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+// ২. জেমিনী এআই কনফিগারেশন (Official @google/genai SDK)
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 // ৩. লাইভ ড্যাশবোর্ড / স্ট্যাটাস রুট
 app.get('/', (req, res) => {
     res.send('⚡ Minister ERP & Logistics Live Webhook Server Running!');
+});
+
+app.get('/api/status', (req, res) => {
+    res.status(200).json({
+        status: 'active',
+        system: 'Minister ERP Engine',
+        dealer: 'DEAL002905',
+        timestamp: new Date().toISOString()
+    });
 });
 
 // ৪. রিয়েল-টাইম পেমেন্ট ওয়েবহুক এন্ডপয়েন্ট
@@ -91,13 +100,15 @@ app.post('/api/payment-webhook', async (req, res) => {
                         let aiMessage = `পেমেন্ট সফল! ৳${amountPaid} জমা হয়েছে। বর্তমান বকেয়া: ৳${newBalance}`;
                         try {
                             if (process.env.GEMINI_API_KEY) {
-                                const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
                                 const prompt = `কাস্টমার ${customer_code} ৳${amountPaid} পরিশোধ করেছেন। বর্তমান বকেয়া ৳${newBalance}। মালামাল ছাড়ার জন্য ১ লাইনের সুন্দর বাংলা নোটিফিকেশন দাও।`;
-                                const result = await model.generateContent(prompt);
-                                aiMessage = result.response.text();
+                                const response = await ai.models.generateContent({
+                                    model: 'gemini-2.5-flash',
+                                    contents: prompt,
+                                });
+                                aiMessage = response.text;
                             }
                         } catch (e) {
-                            console.log('AI SMS Fallback used');
+                            console.log('AI SMS Fallback used:', e.message);
                         }
 
                         return res.status(200).json({
@@ -116,4 +127,3 @@ app.post('/api/payment-webhook', async (req, res) => {
 app.listen(port, () => {
     console.log(`🚀 Server running on port ${port}`);
 });
-
