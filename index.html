@@ -70,9 +70,9 @@
                 <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">100% ERP Certified</span>
             </div>
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <p class="text-xs text-slate-500 font-medium">Closing Balance</p>
-                <h3 class="text-xl font-bold text-slate-800 mt-1">BDT 0.00</h3>
-                <span class="text-xs text-slate-400 mt-1 inline-block">Net Ledger Balance</span>
+                <p class="text-xs text-slate-500 font-medium">Surplus / Net Balance</p>
+                <h3 class="text-xl font-bold text-emerald-600 mt-1">BDT 33.05 Cr</h3>
+                <span class="text-xs text-slate-400 mt-1 inline-block">Verified Advance Buffer</span>
             </div>
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                 <p class="text-xs text-slate-500 font-medium">Overdue Amount</p>
@@ -195,7 +195,7 @@
             { id: 2, entity: 'Minister Hi-Tech Park', date: '2026-03-02', desc: 'Minister Myone Group Stock Dispatch Settlement', channel: 'RTGS', ref: 'MIN-RTGS-5512', type: 'Credit', amount: 15000000, status: 'Settled' },
             { id: 3, entity: 'Butterfly Marketing Ltd.', date: '2026-03-03', desc: 'DBBL Corporate Clearing - Dhaka Hub', channel: 'EFT', ref: 'EFT-339210', type: 'Credit', amount: 1029000, status: 'Cleared' },
             { id: 4, entity: 'Minister Hi-Tech Park', date: '2026-07-06', desc: 'Deposit Slip Reconciliation Cleared (DZ Cleared)', channel: 'EFT', ref: 'MIN-DZ-01', type: 'Credit', amount: 150000, status: 'DZ Cleared' },
-            { id: 5, entity: 'Butterfly Marketing Ltd.', date: '2026-07-10', desc: 'Multi-Bank Aggregation Ledger Batch', channel: 'Aggregation', ref: 'MB-AGG-4410', type: 'Credit', amount: 100000, status: 'Reconciled' }
+            { id: 5, entity: 'Minister Hi-Tech Park', date: '2026-08-16', desc: 'Central SAP Treasury Surplus Clearance REF 5100029481', channel: 'RTGS', ref: 'SAP-5100029481', type: 'Credit', amount: 330563297.00, status: 'Fully Reconciled' }
         ];
 
         let ledgerData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultLedgerData;
@@ -317,4 +317,19 @@
                 heightLeft -= pageHeight;
 
                 while (heightLeft >= 0) {
-  
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                pdf.save('Minister_ERP_Engine_Audit_Ledger_2026.pdf');
+            });
+        }
+
+        window.onload = function() {
+            renderLedger();
+        };
+    </script>
+</body>
+</html>
