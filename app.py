@@ -9,7 +9,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # জেমিনি এআই কনফিগারেশন
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
