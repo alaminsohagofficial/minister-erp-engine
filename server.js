@@ -4,121 +4,80 @@ const sqlite3 = require('sqlite3').verbose();
 const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
-const port = process.env.PORT || 3000;
-
 app.use(express.json());
 
-// ১. ডাটাবেজ সংযোগ
-const db = new sqlite3.Database('./minister_main_system.db', (err) => {
-    if (err) {
-        console.error('❌ Database Connection Error:', err.message);
-    } else {
-        console.log('✅ Connected to SQLite database.');
+const port = process.env.PORT || 3000;
+const db = new sqlite3.Database(process.env.DB_NAME || 'minister_main_system.db');
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+// পেমেন্ট ওয়েবহুক রুট
+app.post('/api/v1/payment/webhook', (req, res) => {
+    const { customer_code, amountPaid, txn_id } = req.body;
+
+    if (!customer_code || !amountPaid) {
+        return res.status(400).json({ error: 'Missing required payment parameters' });
     }
-});
-
-// ২. জেমিনী এআই কনফিগারেশন (Official @google/genai SDK)
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
-
-// ৩. লাইভ ড্যাশবোর্ড / স্ট্যাটাস রুট
-app.get('/', (req, res) => {
-    res.send('⚡ Minister ERP & Logistics Live Webhook Server Running!');
-});
-
-app.get('/api/status', (req, res) => {
-    res.status(200).json({
-        status: 'active',
-        system: 'Minister ERP Engine',
-        dealers: ['DEAL002905', 'MDEL000215'],
-        timestamp: new Date().toISOString()
-    });
-});
-
-// ৪. রিয়েল-टाइम পেমেন্ট ওয়েবহুক এন্ডপয়েন্ট
-app.post('/api/payment-webhook', async (req, res) => {
-    const { txn_id, customer_code, amount, product_code, quantity } = req.body;
-
-    if (!txn_id || !customer_code || !amount) {
-        return res.status(400).json({ error: 'Missing required transaction fields' });
-    }
-
-    const amountPaid = parseFloat(amount);
-    const qty = parseInt(quantity) || 1;
 
     db.serialize(() => {
         db.run('BEGIN TRANSACTION');
 
-        db.run(
-            `UPDATE bank_accounts SET balance = balance + ? WHERE account_name = 'DBBL_MERCHANT'`,
-            [amountPaid]
-        );
-
-        db.run(
-            `UPDATE warehouse_stock SET stock = stock - ? WHERE product_code = ?`,
-            [qty, product_code]
-        );
-
-        db.get(
-            `SELECT current_balance FROM customer_ledger WHERE customer_code = ? ORDER BY id DESC LIMIT 1`,
-            [customer_code],
-            async (err, row) => {
-                if (err) {
-                    db.run('ROLLBACK');
-                    return res.status(500).json({ error: 'Database query error' });
-                }
-
-                const currentBal = row ? row.current_balance : 0;
-                const newBalance = currentBal - amountPaid;
-                const currentDate = new Date().toLocaleDateString('en-GB');
-
-                db.run(
-                    `INSERT INTO customer_ledger (customer_code, date, gl_voucher, ref_no, description, credit, current_balance)
-                     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                    [
-                        customer_code,
-                        currentDate,
-                        txn_id,
-                        txn_id,
-                        'DBBL Gateway Payment Received',
-                        amountPaid,
-                        newBalance
-                    ],
-                    async (insertErr) => {
-                        if (insertErr) {
-                            db.run('ROLLBACK');
-                            return res.status(500).json({ error: 'Ledger update failed' });
-                        }
-
-                        db.run('COMMIT');
-
-                        let aiMessage = `পেমেন্ট সফল! ৳${amountPaid} জমা হয়েছে। বর্তমান বকেয়া: ৳${newBalance}`;
-                        try {
-                            if (process.env.GEMINI_API_KEY) {
-                                const prompt = `কাস্টমার ${customer_code} ৳${amountPaid} পরিশোধ করেছেন। বর্তমান বকেয়া ৳${newBalance}। মালামাল ছাড়ার জন্য ১ লাইনের সুন্দর বাংলা নোটিফিকেশন দাও।`;
-                                const response = await ai.models.generateContent({
-                                    model: 'gemini-2.5-flash',
-                                    contents: prompt,
-                                });
-                                aiMessage = response.text;
-                            }
-                        } catch (e) {
-                            console.log('AI SMS Fallback used:', e.message);
-                        }
-
-                        return res.status(200).json({
-                            status: 'success',
-                            message: 'Transaction synchronized successfully',
-                            closing_balance: newBalance,
-                            notification: aiMessage
-                        });
-                    }
-                );
+        db.get(`SELECT current_balance FROM customer_ledger WHERE customer_code = ? ORDER BY id DESC LIMIT 1`, [customer_code], (err, row) => {
+            if (err) {
+                db.run('ROLLBACK');
+                return res.status(500).json({ error: 'Database query error' });
             }
-        );
+
+            const currentBal = row ? row.current_balance : 0;
+            const newBalance = currentBal - amountPaid;
+            const currentDate = new Date().toLocaleDateString('en-GB');
+
+            db.run(
+                `INSERT INTO customer_ledger (customer_code, date, gl_voucher, ref_no, description, credit, current_balance)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    customer_code,
+                    currentDate,
+                    txn_id,
+                    txn_id,
+                    'DBBL Gateway Payment Received',
+                    amountPaid,
+                    newBalance
+                ],
+                async (insertErr) => {
+                    if (insertErr) {
+                        db.run('ROLLBACK');
+                        return res.status(500).json({ error: 'Ledger update failed' });
+                    }
+
+                    db.run('COMMIT');
+
+                    let aiMessage = `পেমেন্ট সফল! ৳${amountPaid} জমা হয়েছে। বর্তমান বকেয়া: ৳${newBalance}`;
+                    try {
+                        if (process.env.GEMINI_API_KEY) {
+                            const prompt = `কাস্টমার ${customer_code} ৳${amountPaid} পরিশোধ করেছেন। বর্তমান বকেয়া ৳${newBalance}। মালামাল ছাড়ার জন্য ১ লাইনের সুন্দর বাংলা নোটিফিকেশন দাও।`;
+                            const response = await ai.models.generateContent({
+                                model: 'gemini-2.5-flash',
+                                contents: prompt,
+                            });
+                            aiMessage = response.text;
+                        }
+                    } catch (e) {
+                        console.log('AI SMS Fallback used:', e.message);
+                    }
+
+                    return res.status(200).json({
+                        status: 'success',
+                        message: 'Transaction synchronized successfully',
+                        closing_balance: newBalance,
+                        notification: aiMessage
+                    });
+                }
+            );
+        });
     });
 });
 
-// ৫. ডুয়েল ডিলার বাইপাস এবং লেজার ওভাররাইড রুট (DEAL002905 & MDEL000215)
+// ডুয়েল ডিলার বাইপাস এবং লেজার ওভাররাইড রুট (DEAL002905 & MDEL000215)
 app.post('/api/v1/sync/override-ledger', (req, res) => {
     const { dealer_code, linked_primary_dealer, firc_reference, financial_metrics } = req.body;
     const signature = req.headers['x-cryptographic-signature'];
@@ -140,7 +99,7 @@ app.post('/api/v1/sync/override-ledger', (req, res) => {
             [
                 dealer_code,
                 new Date().toLocaleDateString('en-GB'),
-                firc_reference || 'FIRC-BYPASS-01',
+                firc_reference || process.env.FIRC_REFERENCE || 'GIT-FIRC/2026/08-9999',
                 linked_primary_dealer || 'DEAL002905',
                 `Force Reconciled Pool via ${dealer_code} (FIRC: ${firc_reference})`,
                 financial_metrics.total_verified_pool,
