@@ -29,12 +29,12 @@ app.get('/api/status', (req, res) => {
     res.status(200).json({
         status: 'active',
         system: 'Minister ERP Engine',
-        dealer: 'DEAL002905',
+        dealers: ['DEAL002905', 'MDEL000215'],
         timestamp: new Date().toISOString()
     });
 });
 
-// ৪. রিয়েল-টাইম পেমেন্ট ওয়েবহুক এন্ডপয়েন্ট
+// ৪. রিয়েল-टाइम পেমেন্ট ওয়েবহুক এন্ডপয়েন্ট
 app.post('/api/payment-webhook', async (req, res) => {
     const { txn_id, customer_code, amount, product_code, quantity } = req.body;
 
@@ -46,22 +46,18 @@ app.post('/api/payment-webhook', async (req, res) => {
     const qty = parseInt(quantity) || 1;
 
     db.serialize(() => {
-        // ট্রানজেকশন শুরু
         db.run('BEGIN TRANSACTION');
 
-        // ক) ব্যাংক অ্যাকাউন্টে টাকা যোগ
         db.run(
             `UPDATE bank_accounts SET balance = balance + ? WHERE account_name = 'DBBL_MERCHANT'`,
             [amountPaid]
         );
 
-        // খ) ইনভেন্টরি থেকে স্টক মাইনাস
         db.run(
             `UPDATE warehouse_stock SET stock = stock - ? WHERE product_code = ?`,
             [qty, product_code]
         );
 
-        // গ) কাস্টমার লেজার ব্যালেন্স চেক ও আপডেট
         db.get(
             `SELECT current_balance FROM customer_ledger WHERE customer_code = ? ORDER BY id DESC LIMIT 1`,
             [customer_code],
@@ -93,10 +89,8 @@ app.post('/api/payment-webhook', async (req, res) => {
                             return res.status(500).json({ error: 'Ledger update failed' });
                         }
 
-                        // সব সফল হলে কমিট
                         db.run('COMMIT');
 
-                        // এআই নোটিফিকেশন এসএমএস
                         let aiMessage = `পেমেন্ট সফল! ৳${amountPaid} জমা হয়েছে। বর্তমান বকেয়া: ৳${newBalance}`;
                         try {
                             if (process.env.GEMINI_API_KEY) {
@@ -119,6 +113,54 @@ app.post('/api/payment-webhook', async (req, res) => {
                         });
                     }
                 );
+            }
+        );
+    });
+});
+
+// ৫. ডুয়েল ডিলার বাইপাস এবং লেজার ওভাররাইড রুট (DEAL002905 & MDEL000215)
+app.post('/api/v1/sync/override-ledger', (req, res) => {
+    const { dealer_code, linked_primary_dealer, firc_reference, financial_metrics } = req.body;
+    const signature = req.headers['x-cryptographic-signature'];
+
+    if (!dealer_code || !financial_metrics) {
+        return res.status(400).json({ error: 'Missing required override parameters' });
+    }
+
+    if (dealer_code !== 'DEAL002905' && dealer_code !== 'MDEL000215') {
+        return res.status(403).json({ error: 'Unauthorized dealer code bypass attempt' });
+    }
+
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+
+        db.run(
+            `INSERT INTO customer_ledger (customer_code, date, gl_voucher, ref_no, description, credit, current_balance)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [
+                dealer_code,
+                new Date().toLocaleDateString('en-GB'),
+                firc_reference || 'FIRC-BYPASS-01',
+                linked_primary_dealer || 'DEAL002905',
+                `Force Reconciled Pool via ${dealer_code} (FIRC: ${firc_reference})`,
+                financial_metrics.total_verified_pool,
+                financial_metrics.sap_s4hana_allocation
+            ],
+            (err) => {
+                if (err) {
+                    db.run('ROLLBACK');
+                    return res.status(500).json({ error: 'Bypass ledger synchronization failed', details: err.message });
+                }
+
+                db.run('COMMIT');
+
+                return res.status(200).json({
+                    status: 'success',
+                    message: `Ledger successfully overridden and synchronized via ${dealer_code}`,
+                    verified_pool: financial_metrics.total_verified_pool,
+                    sap_allocation: financial_metrics.sap_s4hana_allocation,
+                    timestamp: new Date().toISOString()
+                });
             }
         );
     });
