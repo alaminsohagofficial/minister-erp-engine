@@ -20,7 +20,7 @@ def home():
 @app.route('/dealer-ledger/<dealer_id>', methods=['GET'])
 def get_dealer_ledger(dealer_id):
     try:
-        # ডিলার আইডি চেক করা (এখানে আপনি আপনার ডাটাবেস কুয়েরি যুক্ত করতে পারবেন)
+        # ডিলার আইডি চেক করা
         if dealer_id == "DEAL002905":
             ledger_data = {
                 "dealer_id": "DEAL002905",
@@ -42,8 +42,9 @@ def get_dealer_ledger(dealer_id):
         Please provide a professional, concise summary of this dealer's financial status in Bengali.
         """
 
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        ai_response = model.generate_content(prompt)
+        # আপডেট করা জেমিনি ক্লায়েন্ট কল পদ্ধতি
+        client = genai.GenerativeModel('gemini-1.5-flash')
+        ai_response = client.generate_content(prompt)
 
         return jsonify({
             "status": "success",
@@ -63,8 +64,8 @@ def generate_ai_notice():
         data = request.json
         prompt = data.get("prompt", "Provide an ERP system update notification.")
         
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content(prompt)
+        client = genai.GenerativeModel('gemini-1.5-flash')
+        response = client.generate_content(prompt)
         
         return jsonify({
             "status": "success",
