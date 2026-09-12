@@ -14,13 +14,12 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 // ক্রিপ্টোগ্রাফিক সিগনেচার ভেরিফিকেশন মিডলওয়্যার
 const verifySignature = (req, res, next) => {
     const signature = req.headers['x-cryptographic-signature'];
-    const secret = process.env.API_SECRET_KEY || 'your-fallback-secret';
+    const secret = process.env.API_SECRET_KEY || 'minister-secret-key';
 
     if (!signature) {
         return res.status(401).json({ error: 'Missing cryptographic signature' });
     }
 
-    // উদাহরণস্বরূপ HMAC SHA256 ভেরিফিকেশন
     const hmac = crypto.createHmac('sha256', secret);
     const digest = hmac.update(JSON.stringify(req.body)).digest('hex');
 
@@ -57,8 +56,8 @@ app.post('/api/v1/payment/webhook', (req, res) => {
                 [
                     customer_code,
                     currentDate,
-                    txn_id,
-                    txn_id,
+                    txn_id || 'TXN-' + Date.now(),
+                    txn_id || 'REF-' + Date.now(),
                     'DBBL Gateway Payment Received',
                     amountPaid,
                     newBalance
@@ -71,14 +70,12 @@ app.post('/api/v1/payment/webhook', (req, res) => {
 
                     db.run('COMMIT');
 
-                    // পেমেন্ট রেসপন্স দ্রুত পাঠিয়ে দিয়ে এআই নোটিফিকেশন ব্যাকগ্রাউন্ডে প্রসেস করা যেতে পারে
                     res.status(200).json({
                         status: 'success',
                         message: 'Transaction synchronized successfully',
                         closing_balance: newBalance
                     });
 
-                    // ব্যাকগ্রাউন্ডে জেমিনি এআই কল হ্যান্ডেলিং
                     try {
                         if (process.env.GEMINI_API_KEY) {
                             const prompt = `কাস্টমার ${customer_code} ৳${amountPaid} পরিশোধ করেছেন। বর্তমান বকেয়া ৳${newBalance}। মালামাল ছাড়ার জন্য ১ লাইনের সুন্দর বাংলা নোটিফিকেশন দাও।`;
@@ -86,10 +83,10 @@ app.post('/api/v1/payment/webhook', (req, res) => {
                                 model: 'gemini-2.5-flash',
                                 contents: prompt,
                             });
-                            console.log('AI Notification Generated:', response.text);
+                            console.log('AI Notification:', response.text);
                         }
                     } catch (e) {
-                        console.log('AI SMS Generation failed:', e.message);
+                        console.log('AI Notification Fallback:', e.message);
                     }
                 }
             );
