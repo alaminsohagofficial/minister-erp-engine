@@ -1,4 +1,4 @@
-Flask==3.0.2
-gunicorn==21.2.0
+Flask==3.0.3
+WeasyPrint==60.1
 requests==2.31.0
-weasyprint==60.0
+python-dotenv==1.0.1
