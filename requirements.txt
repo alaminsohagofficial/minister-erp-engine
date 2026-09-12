@@ -1,4 +1,3 @@
 Flask==3.0.3
-WeasyPrint==60.1
-requests==2.31.0
+WeasyPrint==62.3
 python-dotenv==1.0.1
