@@ -1,314 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minister ERP Ledger & Audit Console - Dual Dealer Bypass Division</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Minister & Salsabilah Dual-Dealer ERP Dashboard</title>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { color: #0056b3; text-align: center; margin-bottom: 5px; font-size: 24px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+        .card { background: #fafbfc; border: 1px solid #e1e4e8; border-radius: 6px; padding: 20px; margin-bottom: 20px; }
+        .card h3 { margin-top: 0; color: #24292e; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #2ea44f; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
+        button:hover { background-color: #2c974b; }
+        .result-box { margin-top: 15px; padding: 15px; background: #eef2f7; border-left: 4px solid #0056b3; border-radius: 4px; font-family: monospace; white-space: pre-wrap; word-break: break-all; font-size: 13px; display: none; }
+        .status-badge { display: inline-block; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 4px; background: #ffdf5d; color: #735c0f; margin-bottom: 15px; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body>
 
-    <!-- Top Navigation Header -->
-    <header class="bg-blue-900 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
-            <div class="flex items-center space-x-3 mb-2 sm:mb-0">
-                <div class="bg-blue-600 p-2 rounded-lg font-bold tracking-wider text-xl">ERP</div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight">MINISTER-ERP-ENGINE CONSOLE</h1>
-                    <p class="text-xs text-blue-200">Exclusive Minister Hi-Tech Park Compliance & Ledger Bypass</p>
-                </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs bg-emerald-800 px-3 py-1.5 rounded-full border border-emerald-700">Primary: DEAL002905</span>
-                <span class="text-xs bg-blue-800 px-3 py-1.5 rounded-full border border-blue-700">Secondary: MDEL000215</span>
-                <button onclick="window.print()" class="bg-blue-700 hover:bg-blue-600 text-xs px-3 py-1.5 rounded transition font-medium">Print Report</button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
-
-        <!-- Action & Filter Bar -->
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <input type="text" id="searchInput" placeholder="Search transactions..." onkeyup="filterLedger()" class="px-3 py-2 border border-slate-300 rounded-lg text-sm w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <select id="entityFilter" onchange="filterLedger()" class="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">All Dealer Codes</option>
-                    <option value="Minister Hi-Tech Park (DEAL002905)">SR Electronics Park (DEAL002905)</option>
-                    <option value="Salsabilah Electronics Park (MDEL000215)">Salsabilah Electronics Park (MDEL000215)</option>
-                </select>
-                <select id="channelFilter" onchange="filterLedger()" class="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">All Channels</option>
-                    <option value="RTGS">RTGS Settled</option>
-                    <option value="FIRC">FIRC Verified</option>
-                    <option value="SAP Sync">SAP S/4HANA</option>
-                    <option value="Cash Discount">Cash Discount Pool</option>
-                </select>
-            </div>
-            <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm flex items-center gap-2">
-                    <span>+ Add Ledger Entry</span>
-                </button>
-                <button onclick="exportPDF()" class="bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm">
-                    Export PDF
-                </button>
-            </div>
-        </div>
-
-        <!-- Dashboard Metrics Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <p class="text-xs text-slate-500 font-medium">Total Verified Pool</p>
-                <h3 class="text-xl font-bold text-blue-900 mt-1">BDT 35,189,545.00</h3>
-                <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">FIRC GIT-FIRC/2026/08-9999</span>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <p class="text-xs text-slate-500 font-medium">SAP S/4HANA Allocation</p>
-                <h3 class="text-xl font-bold text-emerald-600 mt-1">BDT 30,683,180.00</h3>
-                <span class="text-xs text-slate-400 mt-1 inline-block">System Synchronized</span>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <p class="text-xs text-slate-500 font-medium">Unallocated Reserve</p>
-                <h3 class="text-xl font-bold text-blue-600 mt-1">BDT 3,117.00</h3>
-                <span class="text-xs text-blue-600 mt-1 inline-block">Active Buffer</span>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <p class="text-xs text-slate-500 font-medium">Total Transactions</p>
-                <h3 id="totalTxCount" class="text-xl font-bold text-slate-800 mt-1">0</h3>
-                <span class="text-xs text-emerald-600 mt-1 inline-block">Bypass Route Active</span>
-            </div>
-        </div>
-
-        <!-- Ledger Table Section -->
-        <div id="pdfContent" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <div>
-                    <h2 class="font-bold text-slate-800">Minister Hi-Tech Park Consolidated Ledger & Bypass Audit Log</h2>
-                    <p class="text-xs text-slate-500">SR Electronics Park (DEAL002905) & Salsabilah Electronics Park (MDEL000215)</p>
-                </div>
-                <span class="text-xs text-slate-500 font-medium" id="recordCountLabel">Showing 0 entries</span>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-100/70 text-slate-600 text-xs uppercase tracking-wider font-semibold border-b border-slate-200">
-                            <th class="p-3">Date</th>
-                            <th class="p-3">Dealer Entity</th>
-                            <th class="p-3">Particulars / Description</th>
-                            <th class="p-3">Channel</th>
-                            <th class="p-3">Reference / Tx ID</th>
-                            <th class="p-3">Type</th>
-                            <th class="p-3 text-right">Amount (BDT)</th>
-                            <th class="p-3 text-center">Audit Status</th>
-                            <th class="p-3 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ledgerTableBody" class="divide-y divide-slate-100 text-sm">
-                        <!-- Dynamic rows populated via JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Modal for Adding New Ledger Entry -->
-    <div id="entryModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-lg text-slate-800">Add New Minister Ledger Entry</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
-            </div>
-            <form id="ledgerForm" onsubmit="addLedgerEntry(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Dealer Entity / Code</label>
-                    <select id="entryEntity" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="Minister Hi-Tech Park (DEAL002905)">SR Electronics Park (DEAL002905)</option>
-                        <option value="Salsabilah Electronics Park (MDEL000215)">Salsabilah Electronics Park (MDEL000215)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Date</label>
-                    <input type="date" id="entryDate" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Particulars / Description</label>
-                    <input type="text" id="entryDesc" placeholder="e.g. Cash Discount Stock Settlement" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">Channel</label>
-                        <select id="entryChannel" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="RTGS">RTGS</option>
-                            <option value="FIRC">FIRC</option>
-                            <option value="SAP Sync">SAP Sync</option>
-                            <option value="Cash Discount">Cash Discount</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">Entry Type</label>
-                        <select id="entryType" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="Credit">Credit (+)</option>
-                            <option value="Debit">Debit (-)</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Reference ID / FIRC No</label>
-                    <input type="text" id="entryRef" placeholder="e.g. GIT-FIRC/2026/08-9999" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Amount (BDT)</label>
-                    <input type="number" id="entryAmount" step="0.01" placeholder="e.g. 30683180" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition shadow-sm">Save Entry</button>
-                </div>
-            </form>
-        </div>
+<div class="container">
+    <h1>Minister & Salsabilah ERP Engine</h1>
+    <p class="subtitle">Dual-Dealer Secure Financial Ledger & Real-Time Sync Console</p>
+    
+    <div style="text-align: center;">
+        <span class="status-badge" id="env-status">Connecting to Live Backend...</span>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 mt-auto py-4 text-center text-xs text-slate-500">
-        &copy; 2026 Minister-ERP-Engine Compliance Division. All rights reserved.
-    </footer>
+    <!-- পেমেন্ট রিয়েল-টাইম সিংক কার্ড -->
+    <div class="card">
+        <h3>💳 পেমেন্ট ওয়েবহুক ও লেজার আপডেট</h3>
+        <label for="customer_code">Dealer / Customer Code:</label>
+        <select id="customer_code">
+            <option value="DEAL002905">DEAL002905 (Minister Hi-Tech Park)</option>
+            <option value="MDEL000215">MDEL000215 (Salsabilah Electronics)</option>
+        </select>
 
-    <!-- Application Script with LocalStorage -->
-    <script>
-        const STORAGE_KEY = 'minister_exclusive_ledger_v2';
+        <label for="amountPaid">Amount Paid (BDT):</label>
+        <input type="number" id="amountPaid" placeholder="যেমন: 50000" />
 
-        let defaultLedgerData = [
-            { id: 1, entity: 'Minister Hi-Tech Park (DEAL002905)', date: '2026-08-16', desc: 'Primary Stock Dispatch Settlement & Pool Allocation', channel: 'RTGS', ref: 'SAP-5100029481', type: 'Credit', amount: 30683180.00, status: 'Reconciled' },
-            { id: 2, entity: 'Salsabilah Electronics Park (MDEL000215)', date: '2026-08-18', desc: 'Secondary Cash Purchase Discount & Pool Integration', channel: 'Cash Discount', ref: 'GIT-FIRC/2026/08', type: 'Credit', amount: 4503248.00, status: 'Force Bypassed' },
-            { id: 3, entity: 'Minister Hi-Tech Park (DEAL002905)', date: '2026-08-20', desc: 'Unallocated Reserve Fund Adjustment Buffer', channel: 'SAP Sync', ref: 'RES-3117', type: 'Credit', amount: 3117.00, status: 'Verified' }
-        ];
+        <label for="txn_id">Transaction ID (DBBL/EBL):</label>
+        <input type="text" id="txn_id" placeholder="যেমন: TXN-2026-9999" />
 
-        let ledgerData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultLedgerData;
+        <button onclick="triggerPaymentSync()">পেমেন্ট সিংক ও এআই নোটিফিকেশন জেনারেট করুন</button>
+        <div id="payment-result" class="result-box"></div>
+    </div>
 
-        function saveToLocalStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(ledgerData));
+    <!-- লেজার ওভাররাইড কার্ড -->
+    <div class="card">
+        <h3>⚡ ডুয়েল-ডিলার বাইপাস ওভাররাইড</h3>
+        <label for="override_dealer">Bypass Dealer Code:</label>
+        <select id="override_dealer">
+            <option value="DEAL002905">DEAL002905</option>
+            <option value="MDEL000215">MDEL000215</option>
+        </select>
+
+        <label for="verified_pool">Total Verified Pool (BDT):</label>
+        <input type="number" id="verified_pool" value="35189545.00" />
+
+        <button onclick="triggerOverride()">ফোর্স লেজার ওভাররাইড চালান</button>
+        <div id="override-result" class="result-box"></div>
+    </div>
+</div>
+
+<script>
+    // লাইভ ব্যাকএন্ড ইউআরএল (আপনার রেন্ডার ব্যাকএন্ড লিংক এখানে সেট করা আছে)
+    const API_BASE_URL = window.location.hostname === 'localhost' 
+        ? 'http://localhost:3000' 
+        : 'https://minister-erp-engine.onrender.com'; // আপনার রেন্ডার ব্যাকএন্ডের সঠিক লিংক
+
+    document.getElementById('env-status').innerText = `Backend Target: ${API_BASE_URL}`;
+
+    async function triggerPaymentSync() {
+        const customer_code = document.getElementById('customer_code').value;
+        const amountPaid = parseFloat(document.getElementById('amountPaid').value);
+        const txn_id = document.getElementById('txn_id').value || 'TXN-' + Date.now();
+        const resultBox = document.getElementById('payment-result');
+
+        if (!amountPaid) {
+            alert('দয়া করে সঠিক টাকার পরিমাণ লিখুন।');
+            return;
         }
 
-        function renderLedger(dataToRender = ledgerData) {
-            const tbody = document.getElementById('ledgerTableBody');
-            tbody.innerHTML = '';
+        resultBox.style.display = 'block';
+        resultBox.innerText = 'প্রক্রিয়াধীন আছে... অনুগ্রহ করে অপেক্ষা করুন।';
 
-            if (dataToRender.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">No ledger transactions found.</td></tr>`;
-                document.getElementById('totalTxCount').innerText = '0';
-                document.getElementById('recordCountLabel').innerText = 'Showing 0 entries';
-                return;
-            }
-
-            dataToRender.forEach(item => {
-                const badgeColor = item.status.includes('Reconciled') || item.status.includes('Verified') || item.status.includes('Bypassed')
-                    ? 'bg-emerald-50 text-emerald-700' 
-                    : 'bg-amber-50 text-amber-700 border border-amber-200';
-
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50/80 transition';
-                tr.innerHTML = `
-                    <td class="p-3 text-slate-600">${item.date}</td>
-                    <td class="p-3 font-semibold text-blue-900">${item.entity}</td>
-                    <td class="p-3 text-slate-800">${item.desc}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs font-medium">${item.channel}</span></td>
-                    <td class="p-3 text-slate-600 font-mono text-xs">${item.ref}</td>
-                    <td class="p-3"><span class="text-xs font-semibold ${item.type === 'Credit' ? 'text-emerald-600' : 'text-blue-600'}">${item.type}</span></td>
-                    <td class="p-3 text-right font-semibold text-slate-800">BDT ${Number(item.amount).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
-                    <td class="p-3 text-center"><span class="px-2 py-0.5 ${badgeColor} rounded-full text-xs font-semibold inline-block">${item.status}</span></td>
-                    <td class="p-3 text-center">
-                        <button onclick="deleteEntry(${item.id})" class="text-rose-500 hover:text-rose-700 text-xs font-medium">Delete</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/v1/payment/webhook`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ customer_code, amountPaid, txn_id })
             });
-
-            document.getElementById('totalTxCount').innerText = dataToRender.length;
-            document.getElementById('recordCountLabel').innerText = `Showing ${dataToRender.length} entries`;
+            const data = await response.json();
+            resultBox.innerText = JSON.stringify(data, null, 2);
+        } catch (error) {
+            resultBox.innerText = 'Error: সার্ভারের সাথে কানেক্ট করা সম্ভব হয়নি। ব্যাকএন্ড রান আছে কি না চেক করুন।\n' + error.message;
         }
+    }
 
-        function openModal() {
-            document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('entryModal').classList.remove('hidden');
-            document.getElementById('entryModal').classList.add('flex');
-        }
+    async function triggerOverride() {
+        const dealer_code = document.getElementById('override_dealer').value;
+        const verified_pool = parseFloat(document.getElementById('verified_pool').value);
+        const resultBox = document.getElementById('override-result');
 
-        function closeModal() {
-            document.getElementById('entryModal').classList.add('hidden');
-            document.getElementById('entryModal').classList.remove('flex');
-            document.getElementById('ledgerForm').reset();
-        }
+        resultBox.style.display = 'block';
+        resultBox.innerText = 'বাইপাস রিকোয়েস্ট পাঠানো হচ্ছে...';
 
-        function addLedgerEntry(event) {
-            event.preventDefault();
-            const newEntry = {
-                id: Date.now(),
-                entity: document.getElementById('entryEntity').value,
-                date: document.getElementById('entryDate').value,
-                desc: document.getElementById('entryDesc').value,
-                channel: document.getElementById('entryChannel').value,
-                ref: document.getElementById('entryRef').value,
-                type: document.getElementById('entryType').value,
-                amount: parseFloat(document.getElementById('entryAmount').value),
-                status: 'Force Bypassed'
-            };
-
-            ledgerData.unshift(newEntry);
-            saveToLocalStorage();
-            filterLedger();
-            closeModal();
-        }
-
-        function deleteEntry(id) {
-            ledgerData = ledgerData.filter(item => item.id !== id);
-            saveToLocalStorage();
-            filterLedger();
-        }
-
-        function filterLedger() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const entity = document.getElementById('entityFilter').value;
-            const channel = document.getElementById('channelFilter').value;
-
-            const filtered = ledgerData.filter(item => {
-                const matchesQuery = item.desc.toLowerCase().includes(query) || item.ref.toLowerCase().includes(query);
-                const matchesEntity = entity === "" || item.entity === entity;
-                const matchesChannel = channel === "" || item.channel === channel;
-                return matchesQuery && matchesEntity && matchesChannel;
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/v1/sync/override-ledger`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-cryptographic-signature': 'master-bypass-token-2026'
+                },
+                body: JSON.stringify({
+                    dealer_code,
+                    financial_metrics: {
+                        total_verified_pool: verified_pool,
+                        sap_s4hana_allocation: verified_pool
+                    }
+                })
             });
-
-            renderLedger(filtered);
+            const data = await response.json();
+            resultBox.innerText = JSON.stringify(data, null, 2);
+        } catch (error) {
+            resultBox.innerText = 'Error: ওভাররাইড ফেইল করেছে।\n' + error.message;
         }
+    }
+</script>
 
-        function exportPDF() {
-            const { jsPDF } = window.jspdf;
-            const element = document.getElementById('pdfContent');
-            
-            html2canvas(element, { scale: 2 }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgWidth = 190;
-                const pageHeight = 295;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 10;
-
-                pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-                pdf.save('Minister_Exclusive_Bypass_Ledger.pdf');
-            });
-        }
-
-        // Initialize on load
-        renderLedger();
-    </script>
 </body>
 </html>
