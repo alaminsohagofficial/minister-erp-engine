@@ -1,30 +1,25 @@
+import os
 import requests
-import json
+from dotenv import load_dotenv
 
-def fetch_minister_erp_ledger():
-    # Target ERP endpoint for Dealer DEAL002905
-    erp_url = "https://erp.ministerbd.com/api/v1/dealer/ledger"
+load_dotenv()
+
+API_URL = os.getenv('MINISTER_ERP_API_URL', 'https://erp.ministerbd.com/api/v1/ledger')
+API_KEY = os.getenv('MINISTER_ERP_API_KEY', '')
+
+def fetch_dealer_ledger(dealer_code="DEAL002905"):
     headers = {
-        "Authorization": "Bearer TOKEN_OR_API_KEY",
-        "Content-Type": "application/json"
+        'Authorization': f'Bearer {API_KEY}',
+        'Content-Type': 'application/json'
     }
-    payload = {
-        "dealer_code": "DEAL002905",
-        "query_type": "FULL_LEDGER_AUDIT"
-    }
-    
     try:
-        response = requests.post(erp_url, json=payload, headers=headers, timeout=15)
+        response = requests.get(f"{API_URL}/{dealer_code}", headers=headers, timeout=10)
         if response.status_code == 200:
-            erp_data = response.json()
-            print("Successfully fetched data from erp.ministerbd.com")
-            # Compare with our verified pool BDT 35,189,545.00[span_3](start_span)[span_3](end_span)
-            return erp_data
+            return response.json()
         else:
-            print(f"ERP Error Status: {response.status_code}, Response: {response.text}")
+            return {'error': f'HTTP Error: {response.status_code}'}
     except Exception as e:
-        print(f"Connection to Minister ERP failed: {str(e)}")
+        return {'error': str(e)}
 
 if __name__ == '__main__':
-    fetch_minister_erp_ledger()
-  
+    print(fetch_dealer_ledger())
