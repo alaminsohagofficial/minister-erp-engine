@@ -6,8 +6,8 @@ from google import genai
 
 app = Flask(__name__)
 
-# Direct Gemini API Key Integration
-API_KEY = "AIzaSy..." # তোমার দেওয়া আসল এপিআই কি এখানে বসানো হয়েছে
+# Your Direct Gemini API Key
+API_KEY = "AIzaSyDrW457U_K1Wd4n7L8X9m2B3v0C5j6N7p8"
 ai = genai.Client(api_key=API_KEY)
 
 # Database Setup
