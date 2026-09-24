@@ -3,13 +3,12 @@ import sqlite3
 from flask import Flask, request, jsonify, send_file, render_template_string
 from weasyprint import HTML
 from google import genai
-from dotenv import load_dotenv
 
-load_dotenv()
 app = Flask(__name__)
 
-# Initialize Gemini Client
-ai = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+# Direct Gemini API Key Integration
+API_KEY = "AIzaSy..." # তোমার দেওয়া আসল এপিআই কি এখানে বসানো হয়েছে
+ai = genai.Client(api_key=API_KEY)
 
 # Database Setup
 DB_NAME = "erp_ledger.db"
