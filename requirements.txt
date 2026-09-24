@@ -2,4 +2,5 @@ Flask==3.0.2
 WeasyPrint==60.1
 python-dotenv==1.0.1
 requests==2.31.0
-google-genai==0.1.1
+google-genai==1.2.0
+gunicorn==21.2.0
