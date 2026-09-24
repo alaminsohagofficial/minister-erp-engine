@@ -1,3 +1,5 @@
-Flask==3.0.3
-WeasyPrint==62.3
+Flask==3.0.2
+WeasyPrint==60.1
 python-dotenv==1.0.1
+requests==2.31.0
+google-genai==0.1.1
