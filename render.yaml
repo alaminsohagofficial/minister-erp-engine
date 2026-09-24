@@ -1,0 +1,22 @@
+services:
+  # Node.js Webhook & Bypass Server
+  - type: web
+    name: minister-erp-node-engine
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: GEMINI_API_KEY
+        sync: false
+
+  # Python Reconciliation & PDF Engine (WeasyPrint)
+  - type: web
+    name: minister-erp-python-engine
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PORT
+        value: 5000
