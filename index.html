@@ -1,135 +1,52 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minister & Salsabilah Dual-Dealer ERP Dashboard</title>
+    <title>Minister ERP - Dual Dealer Console</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { color: #0056b3; text-align: center; margin-bottom: 5px; font-size: 24px; }
-        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
-        .card { background: #fafbfc; border: 1px solid #e1e4e8; border-radius: 6px; padding: 20px; margin-bottom: 20px; }
-        .card h3 { margin-top: 0; color: #24292e; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
-        input, select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; }
-        button { background-color: #2ea44f; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
-        button:hover { background-color: #2c974b; }
-        .result-box { margin-top: 15px; padding: 15px; background: #eef2f7; border-left: 4px solid #0056b3; border-radius: 4px; font-family: monospace; white-space: pre-wrap; word-break: break-all; font-size: 13px; display: none; }
-        .status-badge { display: inline-block; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 4px; background: #ffdf5d; color: #735c0f; margin-bottom: 15px; }
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { color: #004085; text-align: center; }
+        .card { background: #e9ecef; padding: 15px; margin: 15px 0; border-radius: 6px; }
+        button { background: #0056b3; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #004085; }
+        pre { background: #212529; color: #f8f9fa; padding: 10px; border-radius: 4px; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Minister ERP Engine Console</h1>
+        <p style="text-align: center;">Dual-Dealer Secure Financial Ledger & Gemini AI Hub</p>
+        
+        <div class="card">
+            <h3>Dealer 1: Minister High-Tech Park (DEAL002905)</h3>
+            <button onclick="fetchLedger('DEAL002905')">Check Ledger & SAP Allocation</button>
+            <button onclick="downloadPdf('DEAL002905')">Download Official PDF</button>
+        </div>
 
-<div class="container">
-    <h1>Minister & Salsabilah ERP Engine</h1>
-    <p class="subtitle">Dual-Dealer Secure Financial Ledger & Real-Time Sync Console</p>
-    
-    <div style="text-align: center;">
-        <span class="status-badge" id="env-status">Connecting to Live Backend...</span>
+        <div class="card">
+            <h3>Dealer 2: Salsabila Electronics Park (MDEL000215)</h3>
+            <button onclick="fetchLedger('MDEL000215')">Check Ledger & SAP Allocation</button>
+            <button onclick="downloadPdf('MDEL000215')">Download Official PDF</button>
+        </div>
+
+        <div class="card">
+            <h3>System Output Logs</h3>
+            <pre id="output">System ready...</pre>
+        </div>
     </div>
 
-    <!-- পেমেন্ট রিয়েল-টাইম সিংক কার্ড -->
-    <div class="card">
-        <h3>💳 পেমেন্ট ওয়েবহুক ও লেজার আপডেট</h3>
-        <label for="customer_code">Dealer / Customer Code:</label>
-        <select id="customer_code">
-            <option value="DEAL002905">DEAL002905 (Minister Hi-Tech Park)</option>
-            <option value="MDEL000215">MDEL000215 (Salsabilah Electronics)</option>
-        </select>
-
-        <label for="amountPaid">Amount Paid (BDT):</label>
-        <input type="number" id="amountPaid" placeholder="যেমন: 50000" />
-
-        <label for="txn_id">Transaction ID (DBBL/EBL):</label>
-        <input type="text" id="txn_id" placeholder="যেমন: TXN-2026-9999" />
-
-        <button onclick="triggerPaymentSync()">পেমেন্ট সিংক ও এআই নোটিফিকেশন জেনারেট করুন</button>
-        <div id="payment-result" class="result-box"></div>
-    </div>
-
-    <!-- লেজার ওভাররাইড কার্ড -->
-    <div class="card">
-        <h3>⚡ ডুয়েল-ডিলার বাইপাস ওভাররাইড</h3>
-        <label for="override_dealer">Bypass Dealer Code:</label>
-        <select id="override_dealer">
-            <option value="DEAL002905">DEAL002905</option>
-            <option value="MDEL000215">MDEL000215</option>
-        </select>
-
-        <label for="verified_pool">Total Verified Pool (BDT):</label>
-        <input type="number" id="verified_pool" value="35189545.00" />
-
-        <button onclick="triggerOverride()">ফোর্স লেজার ওভাররাইড চালান</button>
-        <div id="override-result" class="result-box"></div>
-    </div>
-</div>
-
-<script>
-    // লাইভ ব্যাকএন্ড ইউআরএল (আপনার রেন্ডার ব্যাকএন্ড লিংক এখানে সেট করা আছে)
-    const API_BASE_URL = window.location.hostname === 'localhost' 
-        ? 'http://localhost:3000' 
-        : 'https://minister-erp-engine.onrender.com'; // আপনার রেন্ডার ব্যাকএন্ডের সঠিক লিংক
-
-    document.getElementById('env-status').innerText = `Backend Target: ${API_BASE_URL}`;
-
-    async function triggerPaymentSync() {
-        const customer_code = document.getElementById('customer_code').value;
-        const amountPaid = parseFloat(document.getElementById('amountPaid').value);
-        const txn_id = document.getElementById('txn_id').value || 'TXN-' + Date.now();
-        const resultBox = document.getElementById('payment-result');
-
-        if (!amountPaid) {
-            alert('দয়া করে সঠিক টাকার পরিমাণ লিখুন।');
-            return;
+    <script>
+        async function fetchLedger(dealerId) {
+            const res = await fetch(`/api/ledger/${dealerId}`);
+            const data = await res.json();
+            document.getElementById('output').innerText = JSON.stringify(data, null, 2);
         }
 
-        resultBox.style.display = 'block';
-        resultBox.innerText = 'প্রক্রিয়াধীন আছে... অনুগ্রহ করে অপেক্ষা করুন।';
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/v1/payment/webhook`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ customer_code, amountPaid, txn_id })
-            });
-            const data = await response.json();
-            resultBox.innerText = JSON.stringify(data, null, 2);
-        } catch (error) {
-            resultBox.innerText = 'Error: সার্ভারের সাথে কানেক্ট করা সম্ভব হয়নি। ব্যাকএন্ড রান আছে কি না চেক করুন।\n' + error.message;
+        function downloadPdf(dealerId) {
+            window.location.href = `/api/generate-pdf/${dealerId}`;
         }
-    }
-
-    async function triggerOverride() {
-        const dealer_code = document.getElementById('override_dealer').value;
-        const verified_pool = parseFloat(document.getElementById('verified_pool').value);
-        const resultBox = document.getElementById('override-result');
-
-        resultBox.style.display = 'block';
-        resultBox.innerText = 'বাইপাস রিকোয়েস্ট পাঠানো হচ্ছে...';
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/v1/sync/override-ledger`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'x-cryptographic-signature': 'master-bypass-token-2026'
-                },
-                body: JSON.stringify({
-                    dealer_code,
-                    financial_metrics: {
-                        total_verified_pool: verified_pool,
-                        sap_s4hana_allocation: verified_pool
-                    }
-                })
-            });
-            const data = await response.json();
-            resultBox.innerText = JSON.stringify(data, null, 2);
-        } catch (error) {
-            resultBox.innerText = 'Error: ওভাররাইড ফেইল করেছে।\n' + error.message;
-        }
-    }
-</script>
-
+    </script>
 </body>
 </html>
