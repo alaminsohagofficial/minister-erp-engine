@@ -1,193 +1,82 @@
+from flask import Flask, jsonify, request
+from datetime import datetime
 import sqlite3
-import os
 
-DATABASE_NAME = "erp_database.db"
+app = Flask(__name__)
 
+# ডাটাবেস ইনিশিয়ালাইজেশন (SQLite)
 def init_db():
-    """SQLite3 ডাটাবেজ এবং ট্রানজেকশন টেবিল ইনিশিয়ালাইজ করার ফাংশন"""
-    conn = sqlite3.connect(DATABASE_NAME)
+    conn = sqlite3.connect('erp_sync.db')
     cursor = conn.cursor()
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS transactions (
+        CREATE TABLE IF NOT EXISTS settlements (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            lid TEXT UNIQUE NOT NULL,
-            receiver_name TEXT NOT NULL,
-            receiver_bank TEXT NOT NULL,
-            receiver_account TEXT NOT NULL,
-            sender_card_type TEXT,
-            sender_card_number TEXT,
-            sender_account TEXT NOT NULL,
-            nexuspay_id TEXT,
-            amount REAL NOT NULL,
-            transaction_date TEXT NOT NULL,
-            status TEXT DEFAULT 'SUCCESSFUL',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            dealer_id TEXT,
+            txn_id TEXT UNIQUE,
+            sap_lid TEXT,
+            amount REAL,
+            status TEXT,
+            timestamp TEXT
         )
     ''')
     conn.commit()
     conn.close()
 
-def sync_transaction(data):
-    """প্রতিটি ট্রানজেকশন ডাটাবেজে সেভ করবে এবং LID ডুপ্লিকেট রোধ করবে"""
-    init_db()
-    conn = sqlite3.connect(DATABASE_NAME)
+init_db()
+
+# রিয়েল-টাইম এপিআই রিসিভার এবং সিংক এন্ডপয়েন্ট
+@app.route('/api/v1/sync-settlement', methods=['POST'])
+def sync_settlement():
+    incoming_data = request.json
+    
+    if not incoming_data or 'transactions' not in incoming_data:
+        return jsonify({"status": "ERROR", "message": "Invalid JSON payload"}), 400
+
+    dealer_id = incoming_data.get("dealer_id")
+    transactions = incoming_data.get("transactions", [])
+
+    conn = sqlite3.connect('erp_sync.db')
     cursor = conn.cursor()
     
-    try:
-        cursor.execute('''
-            INSERT INTO transactions (
-                lid, receiver_name, receiver_bank, receiver_account, 
-                sender_card_type, sender_card_number, sender_account, 
-                nexuspay_id, amount, transaction_date, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        '', (
-            data.get('lid'),
-            data.get('receiver_name'),
-            data.get('receiver_bank'),
-            data.get('receiver_account'),
-            data.get('sender_card_type'),
-            data.get('sender_card_number'),
-            data.get('sender_account'),
-            data.get('nexuspay_id'),
-            data.get('amount'),
-            data.get('transaction_date'),
-            data.get('status', 'SUCCESSFUL')
-        ))
-        conn.commit()
-        print(f"[SUCCESS] Transaction {data.get('lid')} synchronized successfully.")
-        return True
-    except sqlite3.IntegrityError:
-        print(f"[DUPLICATE BLOCKED] Transaction LID {data.get('lid')} already exists in database.")
-        return False
-    except Exception as e:
-        print(f"[ERROR] Failed to sync transaction: {e}")
-        return False
-    finally:
-        conn.close()
+    synced_count = 0
+    for txn in transactions:
+        try:
+            cursor.execute('''
+                INSERT OR IGNORE INTO settlements (dealer_id, txn_id, sap_lid, amount, status, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (
+                dealer_id,
+                txn.get("txn_id"),
+                txn.get("sap_lid"),
+                txn.get("amount"),
+                txn.get("status"),
+                datetime.utcnow().isoformat()
+            ))
+            if cursor.rowcount > 0:
+                synced_count += 1
+        except Exception as e:
+            print(f"Error inserting transaction: {e}")
 
-if __name__ == "__main__":
-    # অফিশিয়াল লেজার ও রসিদ থেকে সংগৃহীত সম্পূর্ণ ৯টি ট্রানজেকশনের ডেটাসেট
-    master_transactions_list = [
-        {
-            "lid": "LID02037811634",
-            "receiver_name": "MYONE ELECTRONICS INDUSTRIES LTD.",
-            "receiver_bank": "Dutch-Bangla Bank PLC.",
-            "receiver_account": "1041100034560",
-            "sender_card_type": "Agent Banking Card",
-            "sender_card_number": "0130 **** **** 5995",
-            "sender_account": "7017511802593",
-            "nexuspay_id": "01719732134",
-            "amount": 30005.00,
-            "transaction_date": "28-Jul-2026 07:27 PM",
-            "status": "SUCCESSFUL"
-        },
-        {
-            "lid": "LID02104465787",
-            "receiver_name": "MYONE ELECTRONICS INDUSTRIES LTD.",
-            "receiver_bank": "Dutch-Bangla Bank PLC.",
-            "receiver_account": "1041100034560",
-            "sender_card_type": "Agent Banking Card",
-            "sender_card_number": "0130 **** **** 5995",
-            "sender_account": "7017511802593",
-            "nexuspay_id": "01719732134",
-            "amount": 50000.00,
-            "transaction_date": "31-Aug-2026 05:33 PM",
-            "status": "SUCCESSFUL"
-        },
-        {
-            "lid": "LID01976788453",
-            "receiver_name": "MyOne Electronics Industries Ltd.",
-            "receiver_bank": "Dutch-Bangla Bank PLC.",
-            "receiver_account": "1041100034560",
-            "sender_card_type": "FT/NEXP",
-            "sender_card_number": "N/A",
-            "sender_account": "DEAL002905",
-            "nexuspay_id": "100NEXP26187M597",
-            "amount": 238000.00,
-            "transaction_date": "06-Jul-2026",
-            "status": "SUCCESSFUL"
-        },
-        {
-            "lid": "LID01996890123",
-            "receiver_name": "MyOne Electronics Industries Ltd.",
-            "receiver_bank": "Dutch-Bangla Bank PLC.",
-            "receiver_account": "1041100034560",
-            "sender_card_type": "FT/NEXP",
-            "sender_card_number": "N/A",
-            "sender_account": "DEAL002905",
-            "nexuspay_id": "100NEXP26188M616",
-            "amount": 270000.00,
-            "transaction_date": "07-Jul-2026",
-            "status": "SUCCESSFUL"
-        },
-        {
-            "lid": "LID01996889539",
-            "receiver_name": "MyOne Electronics Industries Ltd.",
-            "receiver_bank": "Dutch-Bangla Bank PLC.",
-            "receiver_account": "1041100034560",
-            "sender_card_type": "FT/NEXP",
-            "sender_card_number": "N/A",
-            "sender_account": "DEAL002905",
-            "nexuspay_id": "100NEXP26188M584",
-            "amount": 230000.00,
-            "transaction_date": "07-Jul-2026",
-            "status": "SUCCESSFUL"
-        },
-        {
-            "lid": "LID01998640246",
-            "receiver_name": "MyOne Electronics Industries Ltd.",
-            "receiver_bank": "Dutch-Bangla Bank PLC.",
-            "receiver_account": "1041100034560",
-            "sender_card_type": "NPSB/NXN",
-            "sender_card_number": "N/A",
-            "sender_account": "DEAL002905",
-            "nexuspay_id": "100NXN126189M586",
-            "amount": 297000.00,
-            "transaction_date": "08-Jul-2026",
-            "status": "SUCCESSFUL"
-        },
-        {
-            "lid": "LID01938788435",
-            "receiver_name": "MyOne Electronics Industries Ltd.",
-            "receiver_bank": "Dutch-Bangla Bank PLC.",
-            "receiver_account": "1041100034560",
-            "sender_card_type": "NPSB/NXN",
-            "sender_card_number": "N/A",
-            "sender_account": "DEAL002905",
-            "nexuspay_id": "100NXN126189M591",
-            "amount": 285000.00,
-            "transaction_date": "08-Jul-2026",
-            "status": "SUCCESSFUL"
-        },
-        {
-            "lid": "LID01996914258",
-            "receiver_name": "MyOne Electronics Industries Ltd.",
-            "receiver_bank": "Dutch-Bangla Bank PLC.",
-            "receiver_account": "1041100034560",
-            "sender_card_type": "FT/NEXP",
-            "sender_card_number": "N/A",
-            "sender_account": "DEAL002905",
-            "nexuspay_id": "100NEXP26193M601",
-            "amount": 300000.00,
-            "transaction_date": "12-Jul-2026",
-            "status": "SUCCESSFUL"
-        },
-        {
-            "lid": "LID0199687412",
-            "receiver_name": "MyOne Electronics Industries Ltd.",
-            "receiver_bank": "Dutch-Bangla Bank PLC.",
-            "receiver_account": "1041100034560",
-            "sender_card_type": "FT/NEXP",
-            "sender_card_number": "N/A",
-            "sender_account": "DEAL002905",
-            "nexuspay_id": "100NEXP26193M602",
-            "amount": 300000.00,
-            "transaction_date": "12-Jul-2026",
-            "status": "SUCCESSFUL"
-        }
-    ]
+    conn.commit()
+    conn.close()
 
-    print("Starting ERP Banking Synchronization Process...")
-    for tx in master_transactions_list:
-        sync_transaction(tx)
-    print("Synchronization process completed successfully.")
+    return jsonify({
+        "status": "SUCCESS",
+        "dealer_id": dealer_id,
+        "total_synced": synced_count,
+        "sync_timestamp": datetime.utcnow().isoformat(),
+        "message": "Real-time synchronization completed successfully without manual intervention."
+    }), 200
+
+# লাইভ স্ট্যাটাস চেক করার জন্য
+@app.route('/api/v1/status', methods=['GET'])
+def system_status():
+    return jsonify({
+        "engine": "Minister & SR Dual ERP Sync Engine",
+        "status": "ONLINE",
+        "mode": "Real-Time API Active"
+    })
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
+    
