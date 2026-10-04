@@ -4,18 +4,11 @@ import sqlite3
 from flask import Flask, request, jsonify, send_file, render_template_string
 from weasyprint import HTML
 from google import genai
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
 
 app = Flask(__name__)
 
-# Secure Gemini API Key from Environment Variables
-API_KEY = os.environ.get("GEMINI_API_KEY")
-if not API_KEY:
-    raise ValueError("GEMINI_API_KEY environment variable is missing!")
-
+# Your Direct Gemini API Key
+API_KEY = "AQ.Ab8RN6IuRuD6TNCENfAGU1riEjRbflzz5KIwyvnPT65zuffi2g"
 ai = genai.Client(api_key=API_KEY)
 
 # Database Setup
