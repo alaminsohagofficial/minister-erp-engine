@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="bn" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মিনিস্টার গ্রুপ — ব্যাংক এপিআই ও লেজার সিঙ্ক</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Hind Siliguri', sans-serif; }</style>
+</head>
+<body class="text-slate-100 p-4 sm:p-8">
+
+    <div class="max-w-5xl mx-auto space-y-6">
+
+        <header class="flex justify-between items-center bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+            <div class="flex items-center space-x-4">
+                <div class="bg-emerald-600 p-4 rounded-2xl text-white shadow-lg shadow-emerald-500/20">
+                    <i class="fa-solid fa-building-columns text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white">মিনিস্টার মাইওয়ান গ্রুপ — ব্যাংক এপিআই হাব</h1>
+                    <p class="text-xs text-slate-400">অ্যাকাউন্টস ও লেজার হিট ইঞ্জিন (Acc: 1041100034560)</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 bg-slate-950 border border-slate-800 px-4 py-2 rounded-2xl">
+                <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                <span class="text-xs font-mono text-emerald-400">এপিআই টানেল: অ্যাক্টিভ</span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Entry Form -->
+            <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+                <h2 class="text-base font-bold text-amber-400"><i class="fa-solid fa-bolt mr-2"></i>ব্যাংক টাকা পাঠানোর তথ্য সিঙ্ক করুন</h2>
+                
+                <form id="syncForm" onsubmit="submitBankSync(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs text-slate-300">তারিখ</label>
+                            <input type="date" id="date" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-300">ট্রানজ্যাকশন আইডি / LID</label>
+                            <input type="text" id="trx_id" placeholder="যেমন: LID02104465787" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs text-slate-300">টাকার পরিমাণ (BDT)</label>
+                            <input type="number" id="amount" placeholder="৫০,০০০" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-300">পেমেন্ট চ্যানেল</label>
+                            <select id="payment_method" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white">
+                                <option value="NexusPay / DBBL API">NexusPay / DBBL API</option>
+                                <option value="NPSB Fund Transfer">NPSB Fund Transfer</option>
+                                <option value="BEFTN Clearing">BEFTN Clearing</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-xs transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-sync" id="btnIcon"></i>
+                        <span>ব্যাংক এপিআই দ্বারা লেজারে হিট করুন</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Ledger Summary -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2">
+                    <i class="fa-solid fa-wallet text-emerald-400 mr-1.5"></i> মোট জমা বিবরণী
+                </h3>
+
+                <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+                    <span class="text-[11px] text-slate-400">সর্বমোট ব্যাংক জমা (Total Paid)</span>
+                    <div class="text-2xl font-extrabold text-emerald-400 font-mono" id="totalPaid">৳ 0.00</div>
+                </div>
+
+                <div id="logs" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs font-mono">
+                    <!-- Dynamic logs here -->
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('date').valueAsDate = new Date();
+
+        async function loadSummary() {
+            const res = await fetch('/api/ledger-summary');
+            const data = await res.json();
+            if(data.success) {
+                document.getElementById('totalPaid').innerText = `৳ ${data.total_paid.toLocaleString('bn-BD')}.০০`;
+                
+                const logsContainer = document.getElementById('logs');
+                logsContainer.innerHTML = data.logs.map(log => `
+                    <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
+                        <div class="flex justify-between text-slate-400">
+                            <span>${log.trx_id}</span>
+                            <span class="text-emerald-400 font-bold">SETTLED</span>
+                        </div>
+                        <div class="text-emerald-300 font-bold">৳ ${log.amount.toLocaleString('bn-BD')}.০০</div>
+                        <div class="text-[10px] text-slate-500">${log.date} — ${log.ref}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function submitBankSync(e) {
+            e.preventDefault();
+            const btnIcon = document.getElementById('btnIcon');
+            btnIcon.className = "fa-solid fa-spinner fa-spin";
+
+            const payload = {
+                date: document.getElementById('date').value,
+                transaction_id: document.getElementById('trx_id').value,
+                amount: document.getElementById('amount').value,
+                payment_method: document.getElementById('payment_method').value
+            };
+
+            const res = await fetch('/api/sync-bank-transaction', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            alert(data.message);
+            btnIcon.className = "fa-solid fa-sync";
+
+            if (data.success) {
+                document.getElementById('syncForm').reset();
+                document.getElementById('date').valueAsDate = new Date();
+                loadSummary();
+            }
+        }
+
+        loadSummary();
+    </script>
+</body>
+</html>
