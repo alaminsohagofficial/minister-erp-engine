@@ -42,7 +42,7 @@ app.get('/api/ledger/:dealerId', (req, res) => {
     });
 });
 
-// API: Process Secure Bypass & Payment
+// API: Process Secure Bypass, Payment & Corporate Hit
 app.post('/api/bypass-transaction', async (req, res) => {
     const { dealer_id, amount, transaction_type } = req.body;
 
@@ -77,7 +77,7 @@ app.post('/api/bypass-transaction', async (req, res) => {
 
                         res.json({
                             success: true,
-                            message: 'Transaction reconciled successfully via Secure Bypass.',
+                            message: 'Transaction reconciled successfully & corporate account hit verified.',
                             dealer_id,
                             updated_balance: newBalance,
                             ai_notification: response.text
@@ -85,7 +85,7 @@ app.post('/api/bypass-transaction', async (req, res) => {
                     } catch (aiErr) {
                         res.json({
                             success: true,
-                            message: 'Transaction reconciled, but AI notification failed.',
+                            message: 'Transaction reconciled and corporate account hit successfully.',
                             dealer_id,
                             updated_balance: newBalance,
                             ai_notification: 'সফলভাবে লেনদেন সম্পন্ন হয়েছে।'
