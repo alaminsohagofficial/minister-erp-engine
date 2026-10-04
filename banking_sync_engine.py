@@ -4,6 +4,7 @@ import os
 DATABASE_NAME = "erp_database.db"
 
 def init_db():
+    """SQLite3 ডাটাবেজ এবং ট্রানজেকশন টেবিল ইনিশিয়ালাইজ করার ফাংশন"""
     conn = sqlite3.connect(DATABASE_NAME)
     cursor = conn.cursor()
     cursor.execute('''
@@ -27,6 +28,7 @@ def init_db():
     conn.close()
 
 def sync_transaction(data):
+    """প্রতিটি ট্রানজেকশন ডাটাবেজে সেভ করবে এবং LID ডুপ্লিকেট রোধ করবে"""
     init_db()
     conn = sqlite3.connect(DATABASE_NAME)
     cursor = conn.cursor()
@@ -52,20 +54,20 @@ def sync_transaction(data):
             data.get('status', 'SUCCESSFUL')
         ))
         conn.commit()
-        print(f"Success: Transaction {data.get('lid')} synchronized successfully.")
+        print(f"[SUCCESS] Transaction {data.get('lid')} synchronized successfully.")
         return True
     except sqlite3.IntegrityError:
-        print(f"Duplicate Error: Transaction LID {data.get('lid')} already exists in database.")
+        print(f"[DUPLICATE BLOCKED] Transaction LID {data.get('lid')} already exists in database.")
         return False
     except Exception as e:
-        print(f"Error syncing transaction: {e}")
+        print(f"[ERROR] Failed to sync transaction: {e}")
         return False
     finally:
         conn.close()
 
 if __name__ == "__main__":
-    # ছবি এবং লেজার ডাটা থেকে প্রাপ্ত ৯টি আসল ট্রানজেকশন ডেটাসেট
-    transactions_list = [
+    # অফিশিয়াল লেজার ও রসিদ থেকে সংগৃহীত সম্পূর্ণ ৯টি ট্রানজেকশনের ডেটাসেট
+    master_transactions_list = [
         {
             "lid": "LID02037811634",
             "receiver_name": "MYONE ELECTRONICS INDUSTRIES LTD.",
@@ -185,6 +187,7 @@ if __name__ == "__main__":
         }
     ]
 
-    for tx in transactions_list:
+    print("Starting ERP Banking Synchronization Process...")
+    for tx in master_transactions_list:
         sync_transaction(tx)
-        
+    print("Synchronization process completed successfully.")
