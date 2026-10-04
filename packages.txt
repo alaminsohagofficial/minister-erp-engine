@@ -1,5 +1,15 @@
-libpango-1.0-0
-libharfbuzz0b
-libpangoft2-1.0-0
-libffi-dev
-libcairo2
+{
+  "name": "minister-erp-engine",
+  "version": "1.0.0",
+  "description": "Minister MyOne Group Bank API Ledger Synchronization Engine",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  }
+}
