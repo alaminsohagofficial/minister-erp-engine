@@ -1,51 +1,36 @@
-import os
 from flask import Flask, jsonify, request
-import sqlite3
-from banking_sync_engine import sync_transaction, DATABASE_NAME
+from datetime import datetime
 
 app = Flask(__name__)
 
-# Environment থেকে Gemini API Key নিরাপদে লোড করা
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "default-placeholder-key")
+# মিনিস্টার হাই-টেক পার্কের ভেরিফাইড ট্রানজেকশন ডেটা ও JSON পেলোড
+MINISTER_LEDGER_PAYLOAD = {
+    "dealer_id": "DEAL002905",
+    "client_name": "SR Electronics Park",
+    "total_disputed_pool_bdt": 1920000.00,
+    "clearing_bank": "Dutch-Bangla Bank PLC",
+    "settlement_node": "Bangladesh Bank NPSB Switch",
+    "payload_generation_timestamp": "2026-07-15T06:00:00Z",
+    "transactions": [
+        {"date": "2026-07-06", "txn_id": "100NEXP26187M597", "sap_lid": "LID01976788453", "amount": 238000.00, "status": "SUCCESS"},
+        {"date": "2026-07-07", "txn_id": "100NEXP26188M616", "sap_lid": "LID01996890123", "amount": 270000.00, "status": "SUCCESS"},
+        {"date": "2026-07-07", "txn_id": "100NEXP26188M584", "sap_lid": "LID01996889539", "amount": 230000.00, "status": "SUCCESS"},
+        {"date": "2026-07-08", "txn_id": "100NXN126189M586", "sap_lid": "LID01998640246", "amount": 297000.00, "status": "SUCCESS"},
+        {"date": "2026-07-08", "txn_id": "100NXN126189M591", "sap_lid": "LID01938788435", "amount": 285000.00, "status": "SUCCESS"},
+        {"date": "2026-07-12", "txn_id": "100NEXP26193M601", "sap_lid": "LID01996914258", "amount": 300000.00, "status": "SUCCESS"},
+        {"date": "2026-07-12", "txn_id": "100NEXP26193M602", "sap_lid": "LID01996987412", "amount": 300000.00, "status": "SUCCESS"}
+    ]
+}
 
-@app.route('/')
-def home():
+@app.route('/api/minister/sync', methods=['GET'])
+def get_minister_sync():
     return jsonify({
-        "status": "online",
-        "system": "Minister ERP Engine",
-        "message": "Banking Synchronization & Gemini AI Engine is running.",
-        "ai_status": "API Key Configured" if GEMINI_API_KEY != "default-placeholder-key" else "Warning: Default Key Active"
+        "status": "API PAYLOAD READY",
+        "dealer_code": "DEAL002905",
+        "client": "MD. AL AMIN SOHAG",
+        "data": MINISTER_LEDGER_PAYLOAD
     })
-
-@app.route('/api/transactions', methods=['GET'])
-def get_transactions():
-    """ডাটাবেজ থেকে সমস্ত সিঙ্ক হওয়া ট্রানজেকশন দেখার এপিআই"""
-    conn = sqlite3.connect(DATABASE_NAME)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM transactions ORDER BY id DESC")
-    rows = cursor.fetchall()
-    conn.close()
-    
-    transactions = [dict(row) for row in rows]
-    return jsonify({
-        "success": True,
-        "total_count": len(transactions),
-        "data": transactions
-    })
-
-@app.route('/api/sync', methods=['POST'])
-def api_sync_transaction():
-    """নতুন ট্রানজেকশন রিসিভ করে সিঙ্ক করার এপিআই এন্ডপয়েন্ট"""
-    incoming_data = request.get_json()
-    if not incoming_data or 'lid' not in incoming_data:
-        return jsonify({"success": False, "error": "Invalid data or missing LID"}), 400
-        
-    success = sync_transaction(incoming_data)
-    if success:
-        return jsonify({"success": True, "message": "Transaction synchronized successfully."}), 201
-    else:
-        return jsonify({"success": False, "message": "Duplicate LID or database error."}), 409
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+    
