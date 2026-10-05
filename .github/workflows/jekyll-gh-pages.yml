@@ -14,14 +14,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Setup Pages
+        
+      - name: Setup Pages Environment
         uses: actions/configure-pages@v4
-      - name: Upload artifact
+        
+      - name: Upload Artifact Package
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
-      - name: Deploy to GitHub Pages
+          
+      - name: Deploy to GitHub Pages Live
         uses: actions/deploy-pages@v4
-         
+        
