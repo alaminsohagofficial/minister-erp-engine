@@ -4,9 +4,12 @@
   "description": "Real-Time ERP Sync & AI Notification Engine for Minister Hi-Tech Park",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
-  dependencies": {
-    "express": "^4.19.2"
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "axios": "^1.6.8"
   }
 }
