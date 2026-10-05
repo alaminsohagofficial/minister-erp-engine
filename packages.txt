@@ -1,15 +1,12 @@
 {
   "name": "minister-erp-engine",
   "version": "1.0.0",
-  "description": "Minister MyOne Group Bank API Ledger Synchronization Engine",
+  "description": "Real-Time ERP Sync & AI Notification Engine for Minister Hi-Tech Park",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "dependencies": {
-    "axios": "^1.6.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2"
+  dependencies": {
+    "express": "^4.19.2"
   }
 }
