@@ -1,8 +1,9 @@
 // server.js - Real-time Webhook Listener for Minister ERP Engine
 const express = require('express');
 const crypto = require('crypto');
-const app = express();
+require('dotenv').config();
 
+const app = express();
 app.use(express.json());
 
 // Secret token for enterprise-grade security verification
