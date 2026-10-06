@@ -1,82 +1,60 @@
-from flask import Flask, jsonify, request
-from datetime import datetime
-import sqlite3
+import os
+import requests
+from dotenv import load_dotenv
 
-app = Flask(__name__)
+# এনভায়রনমেন্ট ভেরিয়েবল লোড করা
+load_dotenv()
 
-# ডাটাবেস ইনিশিয়ালাইজেশন (SQLite)
-def init_db():
-    conn = sqlite3.connect('erp_sync.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS settlements (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            dealer_id TEXT,
-            txn_id TEXT UNIQUE,
-            sap_lid TEXT,
-            amount REAL,
-            status TEXT,
-            timestamp TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
+API_URL = os.getenv('SALSABILAH_ERP_API_URL', 'https://erp.salsabilah.com/api/v1/sync')
+API_KEY = os.getenv('SALSABILAH_API_KEY', '')
 
-init_db()
+def load_datanov():
+    # ডেটা সোর্স থেকে পে-লোড ডেটা লোড বা তৈরি করার লজিক
+    # আপনার রিকুইরমেন্ট অনুযায়ী এখানে ডেটা রিটার্ন করবে
+    payload = {
+        # উদাহরণের জন্য একটি বেসিক স্ট্রাকচার, আপনার আসল ডেটা এখানে বসবে
+        "transaction_id": "TXN_SAMPLE_001",
+        "amount": 0.00
+    }
+    return payload
 
-# রিয়েল-টাইম এপিআই রিসিভার এবং সিংক এন্ডপয়েন্ট
-@app.route('/api/v1/sync-settlement', methods=['POST'])
-def sync_settlement():
-    incoming_data = request.json
+def sync_salsabilah_erp(payload):
+    headers = {
+        'X-API-Key': API_KEY,
+        'Content-Type': 'application/json'
+    }
+    try:
+        # এপিআই রিকোয়েস্ট পাঠানো
+        response = requests.post(API_URL, json=payload, headers=headers, timeout=15)
+        
+        # ডিবাগিংয়ের জন্য সার্ভারের স্ট্যাটাস কোড এবং রেসপন্স কনসোলে প্রিন্ট করা
+        print(f"--- API Request Log ---")
+        print(f"URL: {API_URL}")
+        print(f"Status Code: {response.status_code}")
+        print(f"Response Body: {response.text}")
+        print(f"-----------------------")
+        
+        if response.status_code == 200:
+            try:
+                return response.json()
+            except ValueError:
+                return {'success': True, 'raw_response': response.text}
+        else:
+            return {'error': f"Server returned status {response.status_code}: {response.text}"}
+            
+    except Exception as e:
+        print(f"Connection Error: {str(e)}")
+        return {'error': str(e)}
+
+if __name__ == "__main__":
+    print("Starting Salsabilah ERP Sync Engine...")
     
-    if not incoming_data or 'transactions' not in incoming_data:
-        return jsonify({"status": "ERROR", "message": "Invalid JSON payload"}), 400
-
-    dealer_id = incoming_data.get("dealer_id")
-    transactions = incoming_data.get("transactions", [])
-
-    conn = sqlite3.connect('erp_sync.db')
-    cursor = conn.cursor()
+    # ডেটা লোড করা
+    payload_data = load_datanov()
     
-    synced_count = 0
-    for txn in transactions:
-        try:
-            cursor.execute('''
-                INSERT OR IGNORE INTO settlements (dealer_id, txn_id, sap_lid, amount, status, timestamp)
-                VALUES (?, ?, ?, ?, ?, ?)
-            ''', (
-                dealer_id,
-                txn.get("txn_id"),
-                txn.get("sap_lid"),
-                txn.get("amount"),
-                txn.get("status"),
-                datetime.utcnow().isoformat()
-            ))
-            if cursor.rowcount > 0:
-                synced_count += 1
-        except Exception as e:
-            print(f"Error inserting transaction: {e}")
-
-    conn.commit()
-    conn.close()
-
-    return jsonify({
-        "status": "SUCCESS",
-        "dealer_id": dealer_id,
-        "total_synced": synced_count,
-        "sync_timestamp": datetime.utcnow().isoformat(),
-        "message": "Real-time synchronization completed successfully without manual intervention."
-    }), 200
-
-# লাইভ স্ট্যাটাস চেক করার জন্য
-@app.route('/api/v1/status', methods=['GET'])
-def system_status():
-    return jsonify({
-        "engine": "Minister & SR Dual ERP Sync Engine",
-        "status": "ONLINE",
-        "mode": "Real-Time API Active"
-    })
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
-    
+    if payload_data:
+        # সিঙ্ক ফাংশন কল করা
+        result = sync_salsabilah_erp(payload_data)
+        print("Sync Result:", result)
+    else:
+        print("No payload data found to sync.")
