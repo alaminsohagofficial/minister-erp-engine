@@ -96,18 +96,47 @@ def get_minister_sync():
 
 @app.route('/api/minister/trigger-sync', methods=['POST'])
 def trigger_corporate_sync():
-    headers = {"Content-Type": "application/json", "X-Dealer-Authorization": "Bearer DEAL002905_SECURE_TOKEN"}
+    headers = {
+        "Content-Type": "application/json", 
+        "X-Dealer-Authorization": "Bearer DEAL002905_SECURE_TOKEN"
+    }
+    
     try:
         response = requests.post(CORPORATE_ERP_WEBHOOK_URL, json=MINISTER_LEDGER_PAYLOAD, headers=headers, timeout=10)
+        
         if response.status_code == 200:
-            sync_result = {"status": "SUCCESS", "response": response.json()}
+            try:
+                res_data = response.json()
+            except Exception:
+                res_data = response.text
+                
+            sync_result = {
+                "status": "SUCCESS", 
+                "code": response.status_code, 
+                "response": res_data
+            }
         else:
-            sync_result = {"status": "SUCCESS (SIMULATED)", "code": response.status_code, "message": "Payload structured and verified against DBBL audit ref."}
-    except Exception as e:
-        sync_result = {"status": "SUCCESS (VERIFIED)", "note": "Bank statement verified locally via DBBL central audit switch."}
+            try:
+                res_data = response.json()
+            except Exception:
+                res_data = response.text
+                
+            sync_result = {
+                "status": "FAILED", 
+                "code": response.status_code, 
+                "error_response": res_data,
+                "message": "Corporate ERP Webhook returned an error status."
+            }
+            
+    except requests.exceptions.RequestException as e:
+        sync_result = {
+            "status": "CONNECTION_FAILED", 
+            "error_detail": str(e),
+            "message": "Failed to connect to Corporate ERP Webhook server."
+        }
     
     return jsonify({
-        "engine_status": "DISPATCHED",
+        "engine_status": "PROCESSED",
         "dealer_id": "DEAL002905",
         "total_amount_hit": "1,920,000.00 BDT",
         "timestamp": datetime.utcnow().isoformat(),
