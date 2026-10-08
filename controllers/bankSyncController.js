@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-// ইন-মেমোরি লেজার ডাটাবেস (প্রয়োজনে MongoDB/PostgreSQL ব্যবহার করতে পারেন)
+// ইন-মেমোরি লেজার ডেটাবেস
 let ledgerDatabase = [
     {
         date: "2026-07-06",
@@ -39,25 +39,6 @@ exports.syncTransaction = async (req, res) => {
     }
 
     try {
-        /* 
-        // আসল ব্যাংক এপিআই সিমুলেশন
-        const bankResponse = await axios.post(
-            process.env.DBBL_API_URL,
-            {
-                txn_id: transaction_id,
-                target_account: process.env.MINISTER_ACCOUNT_NO,
-                expected_amount: parseFloat(amount)
-            },
-            {
-                headers: {
-                    'Authorization': `Bearer ${process.env.BANK_BEARER_TOKEN}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
-        */
-
-        // এপিআই রেসপন্স সফল হলে লেজারে তথ্য যুক্তকরণ
         const newRecord = {
             date: date || new Date().toISOString().split('T')[0],
             trx_id: transaction_id,
@@ -69,7 +50,6 @@ exports.syncTransaction = async (req, res) => {
 
         ledgerDatabase.unshift(newRecord);
 
-        // লেজারের নতুন ব্যালেন্স হিসেব
         const totalPaid = ledgerDatabase.reduce((sum, item) => sum + item.amount, 0);
 
         return res.status(200).json({
