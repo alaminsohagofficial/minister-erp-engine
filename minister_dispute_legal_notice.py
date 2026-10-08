@@ -17,3 +17,4 @@ def generate_legal_notice(dealer_code, amount_due):
     output_path = f"legal_notice_{dealer_code}.pdf"
     HTML(string=html_content).write_pdf(output_path)
     return output_path
+    
