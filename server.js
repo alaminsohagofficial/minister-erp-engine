@@ -1,38 +1,23 @@
-// server.js - Real-time Webhook Listener for Minister ERP Engine
 const express = require('express');
-const crypto = require('crypto');
+const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
+const bankSyncController = require('./controllers/bankSyncController');
+
 const app = express();
-app.use(express.json());
-
-// Secret token for enterprise-grade security verification
-const WEBHOOK_SECRET = process.env.ERP_WEBHOOK_SECRET || 'minister-secure-sync-key';
-
-app.post('/api/v1/erp-webhook', (req, res) => {
-    const signature = req.headers['x-erp-signature'];
-    
-    // Verify payload integrity for high security
-    const hmac = crypto.createHmac('sha256', WEBHOOK_SECRET);
-    const digest = hmac.update(JSON.stringify(req.body)).digest('hex');
-
-    if (signature !== `sha256=${digest}`) {
-        return res.status(401).json({ status: 'Unauthorized', error: 'Invalid signature' });
-    }
-
-    const transactionData = req.body;
-    console.log('[SPONTANEOUS SYNC] Received live SAP transaction:', transactionData);
-
-    // TODO: Process and insert verified settlement record into database/dashboard storage
-    
-    return res.status(200).json({ 
-        status: 'Success', 
-        message: 'Real-time ERP synchronization completed successfully',
-        timestamp: new Date().toISOString()
-    });
-});
-
 const PORT = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// এপিআই রাউটসমূহ
+app.post('/api/sync-bank-transaction', bankSyncController.syncTransaction);
+app.get('/api/ledger-summary', bankSyncController.getLedgerSummary);
+
 app.listen(PORT, () => {
-    console.log(`Minister ERP Sync Engine running on port ${PORT}`);
+    console.log(`=================================`);
+    console.log(`Minister ERP Engine Live on Port ${PORT}`);
+    console.log(`=================================`);
 });
