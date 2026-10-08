@@ -17,4 +17,4 @@ def sync_salsabilah_erp(payload):
         return response.json() if response.status_code == 200 else {'error': response.text}
     except Exception as e:
         return {'error': str(e)}
-        
+
