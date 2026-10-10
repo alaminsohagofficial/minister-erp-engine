@@ -1,10 +1,10 @@
-from flask import Flask, jsonify, request
 from datetime import datetime
+from flask import Flask, jsonify, request
 import requests
 
 app = Flask(__name__)
 
-# ডাচ্-বাংলা ব্যাংক পিএলসি এবং অডিট রেফারেন্স অনুযায়ী ভেরিফাইড লেজার ডেটা (জুলাই ২০২৬)
+# ডাচ্-বাংলা ব্যাংক পিএলসি এবং অডিট রেফারেন্স অনুযায়ী ভেরিফাইড লেজার ডেটা (জুলাই ২০২৬)
 MINISTER_LEDGER_PAYLOAD = {
     "account_title": "MyOne Electronics Industries Ltd.",
     "account_number": "1041100034560",
@@ -21,128 +21,158 @@ MINISTER_LEDGER_PAYLOAD = {
             "txn_date": "06-JUL-2026",
             "txn_id": "100NEXP26187M597",
             "sap_lid": "LID01976788453",
-            "particulars": "FT/NEXP/100NEXP26187M597/DEAL002905 LID01976788453 (Supplier Adv Minister)",
+            "particulars": (
+                "FT/NEXP/100NEXP26187M597/DEAL002905 LID01976788453 (Supplier"
+                " Adv Minister)"
+            ),
             "amount": 238000.00,
-            "status": "SETTLED"
+            "status": "SETTLED",
         },
         {
             "si_no": 2,
             "txn_date": "07-JUL-2026",
             "txn_id": "100NEXP26188M616",
             "sap_lid": "LID01996890123",
-            "particulars": "FT/NEXP/100NEXP26188M616/DEAL002905 LID01996890123 (MyOne Bank Trans)",
+            "particulars": (
+                "FT/NEXP/100NEXP26188M616/DEAL002905 LID01996890123 (MyOne Bank"
+                " Trans)"
+            ),
             "amount": 270000.00,
-            "status": "SETTLED"
+            "status": "SETTLED",
         },
         {
             "si_no": 3,
             "txn_date": "07-JUL-2026",
             "txn_id": "100NEXP26188M584",
             "sap_lid": "LID01996889539",
-            "particulars": "FT/NEXP/100NEXP26188M584/DEAL002905 LID01996889539 (MyOne Bank Trans)",
+            "particulars": (
+                "FT/NEXP/100NEXP26188M584/DEAL002905 LID01996889539 (MyOne Bank"
+                " Trans)"
+            ),
             "amount": 230000.00,
-            "status": "SETTLED"
+            "status": "SETTLED",
         },
         {
             "si_no": 4,
             "txn_date": "08-JUL-2026",
             "txn_id": "100NXN126189M586",
             "sap_lid": "LID01998640246",
-            "particulars": "NPSB/NXN/100NXN126189M586/DEAL002905 LID01998640246 (Minister Treasury)",
+            "particulars": (
+                "NPSB/NXN/100NXN126189M586/DEAL002905 LID01998640246 (Minister"
+                " Treasury)"
+            ),
             "amount": 297000.00,
-            "status": "SETTLED"
+            "status": "SETTLED",
         },
         {
             "si_no": 5,
             "txn_date": "08-JUL-2026",
             "txn_id": "100NXN126189M591",
             "sap_lid": "LID01938788435",
-            "particulars": "NPSB/NXN/100NXN126189M591/DEAL002905 LID01938788435 (Minister Treasury)",
+            "particulars": (
+                "NPSB/NXN/100NXN126189M591/DEAL002905 LID01938788435 (Minister"
+                " Treasury)"
+            ),
             "amount": 285000.00,
-            "status": "SETTLED"
+            "status": "SETTLED",
         },
         {
             "si_no": 6,
             "txn_date": "12-JUL-2026",
             "txn_id": "100NEXP26193M601",
             "sap_lid": "LID01996914258",
-            "particulars": "FT/NEXP/100NEXP26193M601/DEAL002905 LID01996914258 (Google 65 TV Pt-1)",
+            "particulars": (
+                "FT/NEXP/100NEXP26193M601/DEAL002905 LID01996914258 (Google 65"
+                " TV Pt-1)"
+            ),
             "amount": 300000.00,
-            "status": "SETTLED"
+            "status": "SETTLED",
         },
         {
             "si_no": 7,
             "txn_date": "12-JUL-2026",
             "txn_id": "100NEXP26193M602",
             "sap_lid": "LID01996987412",
-            "particulars": "FT/NEXP/100NEXP26193M602/DEAL002905 LID01996987412 (Google 65 TV Pt-2)",
+            "particulars": (
+                "FT/NEXP/100NEXP26193M602/DEAL002905 LID01996987412 (Google 65"
+                " TV Pt-2)"
+            ),
             "amount": 300000.00,
-            "status": "SETTLED"
-        }
-    ]
+            "status": "SETTLED",
+        },
+    ],
 }
 
-CORPORATE_ERP_WEBHOOK_URL = "https://erp.ministerbd.com/api/v1/dealer/receive-ledger"
+CORPORATE_ERP_WEBHOOK_URL = (
+    "https://erp.ministerbd.com/api/v1/dealer/receive-ledger"
+)
 
-@app.route('/api/minister/sync', methods=['GET'])
+
+@app.route("/api/minister/sync", methods=["GET"])
 def get_minister_sync():
-    return jsonify({
-        "status": "API PAYLOAD SYNCED",
-        "dealer_code": "DEAL002905",
-        "client": "MD. AL AMIN SOHAG",
-        "audit_ref": "DBBL/HO/SYS-AUDIT/2026/10924",
-        "data": MINISTER_LEDGER_PAYLOAD
-    })
+  return jsonify({
+      "status": "API PAYLOAD SYNCED",
+      "dealer_code": "DEAL002905",
+      "client": "MD. AL AMIN SOHAG",
+      "audit_ref": "DBBL/HO/SYS-AUDIT/2026/10924",
+      "data": MINISTER_LEDGER_PAYLOAD,
+  })
 
-@app.route('/api/minister/trigger-sync', methods=['POST'])
+
+@app.route("/api/minister/trigger-sync", methods=["POST"])
 def trigger_corporate_sync():
-    headers = {
-        "Content-Type": "application/json", 
-        "X-Dealer-Authorization": "Bearer DEAL002905_SECURE_TOKEN"
-    }
-    
-    try:
-        response = requests.post(CORPORATE_ERP_WEBHOOK_URL, json=MINISTER_LEDGER_PAYLOAD, headers=headers, timeout=10)
-        
-        if response.status_code == 200:
-            try:
-                res_data = response.json()
-            except Exception:
-                res_data = response.text
-                
-            sync_result = {
-                "status": "SUCCESS", 
-                "code": response.status_code, 
-                "response": res_data
-            }
-        else:
-            try:
-                res_data = response.json()
-            except Exception:
-                res_data = response.text
-                
-            sync_result = {
-                "status": "FAILED", 
-                "code": response.status_code, 
-                "error_response": res_data,
-                "message": "Corporate ERP Webhook returned an error status."
-            }
-            
-    except requests.exceptions.RequestException as e:
-        sync_result = {
-            "status": "CONNECTION_FAILED", 
-            "error_detail": str(e),
-            "message": "Failed to connect to Corporate ERP Webhook server."
-        }
-    
-    return jsonify({
-        "engine_status": "PROCESSED",
-        "dealer_id": "DEAL002905",
-        "total_amount_hit": "1,920,000.00 BDT",
-        "timestamp": datetime.utcnow().isoformat(),
-        "corporate_hit_result": sync_result
-    })
+  headers = {
+      "Content-Type": "application/json",
+      "X-Dealer-Authorization": "Bearer DEAL002905_SECURE_TOKEN",
+  }
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
-    
+  try:
+    response = requests.post(
+        CORPORATE_ERP_WEBHOOK_URL,
+        json=MINISTER_LEDGER_PAYLOAD,
+        headers=headers,
+        timeout=10,
+    )
+
+    if response.status_code == 200:
+      try:
+        res_data = response.json()
+      except Exception:
+        res_data = response.text
+
+      sync_result = {
+          "status": "SUCCESS",
+          "code": response.status_code,
+          "response": res_data,
+      }
+    else:
+      try:
+        res_data = response.json()
+      except Exception:
+        res_data = response.text
+
+      sync_result = {
+          "status": "FAILED",
+          "code": response.status_code,
+          "error_response": res_data,
+          "message": "Corporate ERP Webhook returned an error status.",
+      }
+
+  except requests.exceptions.RequestException as e:
+    sync_result = {
+        "status": "CONNECTION_FAILED",
+        "error_detail": str(e),
+        "message": "Failed to connect to Corporate ERP Webhook server.",
+    }
+
+  return jsonify({
+      "engine_status": "PROCESSED",
+      "dealer_id": "DEAL002905",
+      "total_amount_hit": "1,920,000.00 BDT",
+      "timestamp": datetime.utcnow().isoformat(),
+      "corporate_hit_result": sync_result,
+  })
+
+
+if __name__ == "__main__":
+  app.run(host="0.0.0.0", port=5000, debug=True)
