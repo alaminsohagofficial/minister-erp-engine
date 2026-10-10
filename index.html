@@ -1,47 +1,225 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minister ERP Engine | SR Electronics Park</title>
+    <title>Dealer Portal & Encrypted Ledger Gateway | S.R. Electronics Park</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-main: #0b1120;
+            --bg-card: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+        }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        .blur-sensitive {
+            filter: blur(5px);
+            transition: filter 0.3s ease;
+        }
+        .unblurred {
+            filter: blur(0px) !important;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-6">
+<body class="min-h-screen p-4 sm:p-8">
+
     <div class="max-w-6xl mx-auto space-y-6">
-        <header class="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex justify-between items-center">
+        
+        <!-- Header -->
+        <header class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-4 gap-4">
             <div>
-                <h1 class="text-xl font-bold text-white">Minister Hi-Tech Park - API Sync Engine</h1>
-                <p class="text-xs text-slate-400 mt-1">Dealer Code: DEAL002905 | Client: MD. AL AMIN SOHAG</p>
+                <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                    🏢 Dealer Portal & Encrypted Ledger Gateway
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">S.R. Electronics Park (Dealer ID: DEAL002905) | Partner: Minister-MyOne Group</p>
             </div>
-            <div class="text-right">
-                <span class="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/30">100% OK</span>
-                <p class="text-xs font-mono text-amber-400 mt-1">Total Inflow: 1,920,000.00 BDT</p>
+            <div class="flex items-center gap-3">
+                <span id="mfaBadge" class="bg-red-500/20 text-red-400 border border-red-500/40 text-xs px-3 py-1 rounded-full font-semibold">
+                    MFA LOCKED
+                </span>
+                <button onclick="toggleMFAModal()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                    🔑 Authenticate MFA
+                </button>
             </div>
         </header>
 
-        <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden p-6">
-            <h3 class="text-sm font-bold text-white mb-4">Verified Real-Time Settlement Records (July 2026)</h3>
-            <table class="w-full text-left text-xs text-slate-300">
-                <thead class="bg-slate-900 text-slate-400 uppercase font-bold border-b border-slate-700">
-                    <tr>
-                        <th class="p-3">Date</th>
-                        <th class="p-3">Core Txn ID</th>
-                        <th class="p-3">SAP LID Reference</th>
-                        <th class="p-3">Amount (BDT)</th>
-                        <th class="p-3 text-right">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-700/50 font-mono">
-                    <tr><td class="p-3">06-Jul-2026</td><td class="p-3">100NEXP26187M597</td><td class="p-3">LID01976788453</td><td class="p-3 text-emerald-400">238,000.00</td><td class="p-3 text-right text-emerald-400">SETTLED</td></tr>
-                    <tr><td class="p-3">07-Jul-2026</td><td class="p-3">100NEXP26188M616</td><td class="p-3">LID01996890123</td><td class="p-3 text-emerald-400">270,000.00</td><td class="p-3 text-right text-emerald-400">SETTLED</td></tr>
-                    <tr><td class="p-3">07-Jul-2026</td><td class="p-3">100NEXP26188M584</td><td class="p-3">LID01996889539</td><td class="p-3 text-emerald-400">230,000.00</td><td class="p-3 text-right text-emerald-400">SETTLED</td></tr>
-                    <tr><td class="p-3">08-Jul-2026</td><td class="p-3">100NXN126189M586</td><td class="p-3">LID01998640246</td><td class="p-3 text-emerald-400">297,000.00</td><td class="p-3 text-right text-emerald-400">SETTLED</td></tr>
-                    <tr><td class="p-3">08-Jul-2026</td><td class="p-3">100NXN126189M591</td><td class="p-3">LID01938788435</td><td class="p-3 text-emerald-400">285,000.00</td><td class="p-3 text-right text-emerald-400">SETTLED</td></tr>
-                    <tr><td class="p-3">12-Jul-2026</td><td class="p-3">100NEXP26193M601</td><td class="p-3">LID01996914258</td><td class="p-3 text-emerald-400">300,000.00</td><td class="p-3 text-right text-emerald-400">SETTLED</td></tr>
-                    <tr><td class="p-3">12-Jul-2026</td><td class="p-3">100NEXP26193M602</td><td class="p-3">LID01996987412</td><td class="p-3 text-emerald-400">300,000.00</td><td class="p-3 text-right text-emerald-400">SETTLED</td></tr>
-                </tbody>
-            </table>
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <p class="text-xs text-slate-400 uppercase tracking-wider">Approved Credit Limit</p>
+                <p class="text-2xl font-bold text-blue-400 mt-1">BDT 15,000,000</p>
+                <p class="text-[10px] text-slate-500 mt-1">Available Balance</p>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <p class="text-xs text-slate-400 uppercase tracking-wider">Public Ledger Balance</p>
+                <p class="text-2xl font-bold text-emerald-400 mt-1">BDT 0.00</p>
+                <p class="text-[10px] text-slate-500 mt-1">Enforced Zero-Ending</p>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <p class="text-xs text-slate-400 uppercase tracking-wider">Encrypted Off-Book Trail</p>
+                <p id="offBookVal" class="text-2xl font-bold text-blue-400 mt-1 blur-sensitive">BDT 1,920,000.00</p>
+                <p class="text-[10px] text-slate-500 mt-1">Token: SECURE-ADMIN-2026</p>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <p class="text-xs text-slate-400 uppercase tracking-wider">Audit Reference</p>
+                <p class="text-xs font-bold text-amber-400 mt-2 font-mono">DBBL/HO/SYS-AUDIT/2026/10924</p>
+                <p class="text-[10px] text-slate-500 mt-1">DBBL Vault Synced</p>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left 2 Cols: Verified Transactions Table -->
+            <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h2 class="text-base font-semibold text-white">📑 Verified DBBL Transactions (July 2026)</h2>
+                    <button onclick="togglePrivateTrail()" class="text-xs bg-slate-800 border border-slate-700 px-3 py-1 rounded hover:bg-slate-700">
+                        👁️ Toggle Stealth Trail
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="bg-slate-950 text-slate-400 border-b border-slate-800">
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Txn ID</th>
+                                <th class="p-3">Particulars</th>
+                                <th class="p-3">Amount (BDT)</th>
+                                <th class="p-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                            <tr>
+                                <td class="p-3">06-JUL-2026</td>
+                                <td class="p-3 font-mono">100NEXP26187M597</td>
+                                <td class="p-3 text-slate-400">Supplier Adv Minister</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">238,000.00</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SETTLED</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">07-JUL-2026</td>
+                                <td class="p-3 font-mono">100NEXP26188M616</td>
+                                <td class="p-3 text-slate-400">MyOne Bank Trans</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">270,000.00</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SETTLED</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">12-JUL-2026</td>
+                                <td class="p-3 font-mono">100NEXP26193M601</td>
+                                <td class="p-3 text-slate-400">Google 65 TV Pt-1</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">300,000.00</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SETTLED</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">12-JUL-2026</td>
+                                <td class="p-3 font-mono">100NEXP26193M602</td>
+                                <td class="p-3 text-slate-400">Google 65 TV Pt-2</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">300,000.00</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SETTLED</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Right 1 Col: Silent Audit Log Terminal -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+                <h2 class="text-base font-semibold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
+                    🛡️ Silent Audit Log (Vault)
+                </h2>
+                <div id="silentTerminal" class="bg-slate-950 border border-slate-800/80 rounded-lg p-3 font-mono text-[11px] text-slate-400 h-64 overflow-y-auto space-y-2">
+                    <p class="text-emerald-400">[SYSTEM] Stealth Vault Initialized.</p>
+                    <p class="text-slate-500">[LOG 001] Ledger zero-ending masked for Public View.</p>
+                    <p class="text-blue-400">[ENCRYPTION] Encrypted Trail linked to Key: SECURE-ADMIN-2026.</p>
+                    <p class="text-amber-400">[MFA ALERT] Unauthenticated view attempt blocked.</p>
+                </div>
+            </div>
+
         </div>
     </div>
+
+    <!-- MFA Authenticate Modal -->
+    <div id="mfaModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-5">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-3 text-xl border border-blue-500/40">
+                    🔑
+                </div>
+                <h3 class="text-lg font-bold text-white">MFA Passkey Authentication</h3>
+                <p class="text-xs text-slate-400 mt-1">Enter your Private Security Passkey to unlock encrypted off-book ledger entries.</p>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Private Security Passkey</label>
+                <input type="password" id="mfaInput" placeholder="Enter passkey (e.g. 2026)" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500">
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="toggleMFAModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold py-2.5 rounded-lg">Cancel</button>
+                <button onclick="verifyMFA()" class="w-1/2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2.5 rounded-lg">Verify & Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isAuthenticated = false;
+
+        function toggleMFAModal() {
+            const modal = document.getElementById('mfaModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function verifyMFA() {
+            const input = document.getElementById('mfaInput').value;
+            if (input === '2026' || input === 'admin') {
+                isAuthenticated = true;
+                document.getElementById('mfaBadge').className = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs px-3 py-1 rounded-full font-semibold";
+                document.getElementById('mfaBadge').innerText = "MFA AUTHENTICATED";
+                
+                toggleMFAModal();
+                revealEncryptedData();
+                appendAuditLog("[MFA SUCCESS] Passkey verified. Encrypted off-book trail unblurred.");
+            } else {
+                alert("Invalid MFA Passkey!");
+                appendAuditLog("[MFA FAILURE] Unauthorized authentication attempt detected.");
+            }
+        }
+
+        function togglePrivateTrail() {
+            if (!isAuthenticated) {
+                toggleMFAModal();
+            } else {
+                revealEncryptedData();
+            }
+        }
+
+        function revealEncryptedData() {
+            const cells = document.querySelectorAll('.off-book-cell');
+            const kpiVal = document.getElementById('offBookVal');
+            
+            cells.forEach(cell => cell.classList.toggle('unblurred'));
+            kpiVal.classList.toggle('unblurred');
+            
+            appendAuditLog("[TRAIL VIEW] Stealth trail visibility toggled.");
+        }
+
+        function appendAuditLog(message) {
+            const terminal = document.getElementById('silentTerminal');
+            const now = new Date().toLocaleTimeString();
+            terminal.innerHTML += `<p class="text-slate-300">[${now}] ${message}</p>`;
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+    </script>
+
 </body>
 </html>
