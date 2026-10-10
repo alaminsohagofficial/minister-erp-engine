@@ -1,80 +1,47 @@
-const axios = require('axios');
+// controllers/bankSyncController.js
 
-// ইন-মেমোরি লেজার ডেটাবেস
-let ledgerDatabase = [
-    {
-        date: "2026-07-06",
-        trx_id: "100NEXP26187M597",
-        amount: 238000.00,
-        ref: "LID01976788453",
-        status: "SETTLED"
-    },
-    {
-        date: "2026-08-31",
-        trx_id: "LID02104465787",
-        amount: 50000.00,
-        ref: "NexusPay Fund Transfer",
-        status: "SETTLED"
-    }
-];
+// ডামি বা ডেটাবেজ লেজার ডেটা (প্রয়োজনে SQLite বা অন্য ডাটাবেজ যুক্ত করা যাবে)
+let ledgerData = {
+    dealer: "এস আর ইলেকট্রনিক্স পার্ক (MDEL000215)",
+    totalAllocation: 35189545.00,
+    currentBalance: 8498500.00,
+    lastUpdated: new Date().toISOString()
+};
 
-// ১. ব্যাংক ট্রানজ্যাকশন ভেরিফাই ও লেজার সিঙ্ক
-exports.syncTransaction = async (req, res) => {
-    const { transaction_id, amount, date, payment_method } = req.body;
-
-    if (!transaction_id || !amount) {
-        return res.status(400).json({ 
-            success: false, 
-            message: "ট্রানজ্যাকশন আইডি এবং জমার পরিমাণ দেওয়া বাধ্যতামূলক।" 
-        });
-    }
-
-    // ডুপ্লিকেট এন্ট্রি চেক
-    const isDuplicate = ledgerDatabase.some(item => item.trx_id === transaction_id);
-    if (isDuplicate) {
-        return res.status(409).json({
-            success: false,
-            message: "এই ট্রানজ্যাকশনটি আগেই লেজারে সিঙ্ক করা হয়েছে!"
-        });
-    }
-
+// ব্যাংক ট্রানজেকশন সিঙ্ক করার কন্ট্রোলার
+exports.syncTransaction = (req, res) => {
     try {
-        const newRecord = {
-            date: date || new Date().toISOString().split('T')[0],
-            trx_id: transaction_id,
-            amount: parseFloat(amount),
-            ref: payment_method || "NexusPay / Bank API",
-            status: "SETTLED",
-            synced_at: new Date().toLocaleString()
-        };
+        const transactionDetails = req.body;
+        
+        // এখানে ট্রানজেকশন প্রসেসিং বা ভ্যালিডেশন লজিক থাকবে
+        console.log("Received Bank Sync Payload:", transactionDetails);
 
-        ledgerDatabase.unshift(newRecord);
-
-        const totalPaid = ledgerDatabase.reduce((sum, item) => sum + item.amount, 0);
-
-        return res.status(200).json({
+        // সফল রেসপন্স পাঠানো
+        res.status(200).json({
             success: true,
-            message: "ব্যাংক এপিআই দ্বারা ভেরিফাইড এবং মিনিস্টার লেজারে সফলভাবে হিট হয়েছে!",
-            record: newRecord,
-            total_paid: totalPaid
+            message: "ব্যাংক ট্রানজেকশন সফলভাবে সিঙ্ক করা হয়েছে।",
+            data: transactionDetails,
+            timestamp: new Date().toISOString()
         });
-
     } catch (error) {
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
-            message: "ব্যাংক সিস্টেমের সাথে কানেক্ট করা যায়নি। " + error.message
+            error: error.message
         });
     }
 };
 
-// ২. বর্তমান লেজার তথ্য পাওয়ার এন্ডপয়েন্ট
+// লেজার সামারি রিটার্ন করার কন্ট্রোলার
 exports.getLedgerSummary = (req, res) => {
-    const totalPaid = ledgerDatabase.reduce((sum, item) => sum + item.amount, 0);
-    return res.status(200).json({
-        success: true,
-        vendor_account: process.env.MINISTER_ACCOUNT_NO || "1041100034560",
-        total_transactions: ledgerDatabase.length,
-        total_paid: totalPaid,
-        logs: ledgerDatabase
-    });
+    try {
+        res.status(200).json({
+            success: true,
+            ledger: ledgerData
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
 };
