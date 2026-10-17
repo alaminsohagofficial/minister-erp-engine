@@ -1,5 +1,5 @@
-import requests
 import json
+import requests
 
 def push_audit_payload():
     payload = {
@@ -23,4 +23,4 @@ def push_audit_payload():
 
 if __name__ == '__main__':
     push_audit_payload()
-  
+    
