@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages Dashboard
+Name: Deploy GitHub Pages Dashboard
 
 on:
   push:
