@@ -18,3 +18,4 @@ def fetch_and_sync_erp_data():
 
 if __name__ == "__main__":
     fetch_and_sync_erp_data()
+    
