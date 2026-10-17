@@ -78,4 +78,4 @@ if __name__ == "__main__":
 
     is_valid = verifier.verify_transaction_payload(sample_webhook, sample_slip)
     print(f"Verification Status: {is_valid}")
-  
+    
