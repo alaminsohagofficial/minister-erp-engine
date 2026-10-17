@@ -1,11 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 from flask import Flask, jsonify, request
 import requests
 
 app = Flask(__name__)
 
-# এনভায়রনমেন্ট ভেরিয়েবল বা নিরাপদ কনফিগারেশন থেকে টোকেন ও ইউআরএল লোড করা
+# ১. এনভায়রনমেন্ট কনফিগারেশন এবং সিকিউরিটি টোকেন লোড করা
 CORPORATE_ERP_WEBHOOK_URL = os.getenv(
     "ERP_WEBHOOK_URL", "https://erp.ministerbd.com/api/v1/dealer/receive-ledger"
 )
@@ -13,102 +13,30 @@ DEALER_SECURE_TOKEN = os.getenv(
     "DEALER_SECURE_TOKEN", "DEAL002905_SECURE_TOKEN"
 )
 
-# ডাচ্-বাংলা ব্যাংক পিএলসি এবং অডিট রেফারেন্স অনুযায়ী ভেরিফাইড লেজার ডেটা (জুলাই ২০২৬)
+# ২. ডিলার এবং লেজার ডেটা মাস্টার পে-লোড (S.R. Electronics Park - DEAL002905)
 MINISTER_LEDGER_PAYLOAD = {
     "account_title": "MyOne Electronics Industries Ltd.",
-    "account_number": "1041100034560",
+    "account_number": "3311901022846",  # সঠিক পূবালী ব্যাংক কর্পোরেট অ্যাকাউন্ট
     "dealer_id": "DEAL002905",
     "remitter_ref": "S. R. ELECTRONICS PARK (DEAL002905)",
-    "statement_period": "06-JUL-2026 to 12-JUL-2026",
-    "total_credit_amount_bdt": 1920000.00,
-    "closing_balance_bdt": 1920000.00,
-    "clearing_bank": "Dutch-Bangla Bank PLC",
-    "audit_ref": "DBBL/HO/SYS-AUDIT/2026/10924",
+    "statement_period": "18-OCT-2026",
+    "total_credit_amount_bdt": 100050.00,
+    "closing_balance_bdt": 100050.00,
+    "clearing_bank": "Pubali Bank PLC",
+    "audit_ref": "PUBALI-SYS-AUDIT/2026/21628",
     "transactions": [
         {
             "si_no": 1,
-            "txn_date": "06-JUL-2026",
-            "txn_id": "100NEXP26187M597",
-            "sap_lid": "LID01976788453",
+            "txn_date": "18-OCT-2026 02:40 AM",
+            "txn_id": "2026101818-2-21628",
+            "sap_lid": "LID02026101801",
             "particulars": (
-                "FT/NEXP/100NEXP26187M597/DEAL002905 LID01976788453 (Supplier"
-                " Adv Minister)"
+                "FT/PUBALI/2026101818-2-21628/DEAL002905 (Pubali Merchant"
+                " Payment)"
             ),
-            "amount": 238000.00,
+            "amount": 100050.00,
             "status": "SETTLED",
-        },
-        {
-            "si_no": 2,
-            "txn_date": "07-JUL-2026",
-            "txn_id": "100NEXP26188M616",
-            "sap_lid": "LID01996890123",
-            "particulars": (
-                "FT/NEXP/100NEXP26188M616/DEAL002905 LID01996890123 (MyOne Bank"
-                " Trans)"
-            ),
-            "amount": 270000.00,
-            "status": "SETTLED",
-        },
-        {
-            "si_no": 3,
-            "txn_date": "07-JUL-2026",
-            "txn_id": "100NEXP26188M584",
-            "sap_lid": "LID01996889539",
-            "particulars": (
-                "FT/NEXP/100NEXP26188M584/DEAL002905 LID01996889539 (MyOne Bank"
-                " Trans)"
-            ),
-            "amount": 230000.00,
-            "status": "SETTLED",
-        },
-        {
-            "si_no": 4,
-            "txn_date": "08-JUL-2026",
-            "txn_id": "100NXN126189M586",
-            "sap_lid": "LID01998640246",
-            "particulars": (
-                "NPSB/NXN/100NXN126189M586/DEAL002905 LID01998640246 (Minister"
-                " Treasury)"
-            ),
-            "amount": 297000.00,
-            "status": "SETTLED",
-        },
-        {
-            "si_no": 5,
-            "txn_date": "08-JUL-2026",
-            "txn_id": "100NXN126189M591",
-            "sap_lid": "LID01938788435",
-            "particulars": (
-                "NPSB/NXN/100NXN126189M591/DEAL002905 LID01938788435 (Minister"
-                " Treasury)"
-            ),
-            "amount": 285000.00,
-            "status": "SETTLED",
-        },
-        {
-            "si_no": 6,
-            "txn_date": "12-JUL-2026",
-            "txn_id": "100NEXP26193M601",
-            "sap_lid": "LID01996914258",
-            "particulars": (
-                "FT/NEXP/100NEXP26193M601/DEAL002905 LID01996914258 (Google"
-                " 65 TV Pt-1)"
-            ),
-            "amount": 300000.00,
-            "status": "SETTLED",
-        },
-        {
-            "si_no": 7,
-            "txn_date": "12-JUL-2026",
-            "txn_id": "100NEXP26193M602",
-            "sap_lid": "LID01996987412",
-            "particulars": (
-                "FT/NEXP/100NEXP26193M602/DEAL002905 LID01996987412 (Google"
-                " 65 TV Pt-2)"
-            ),
-            "amount": 300000.00,
-            "status": "SETTLED",
-        },
+        }
     ],
 }
 
@@ -129,7 +57,7 @@ def get_minister_sync():
       "status": "API PAYLOAD SYNCED",
       "dealer_code": "DEAL002905",
       "client": "MD. AL AMIN SOHAG",
-      "audit_ref": "DBBL/HO/SYS-AUDIT/2026/10924",
+      "audit_ref": "PUBALI-SYS-AUDIT/2026/21628",
       "data": MINISTER_LEDGER_PAYLOAD,
   })
 
@@ -146,7 +74,7 @@ def trigger_corporate_sync():
         CORPORATE_ERP_WEBHOOK_URL,
         json=MINISTER_LEDGER_PAYLOAD,
         headers=headers,
-        timeout=10,
+        timeout=15,
     )
 
     try:
@@ -178,12 +106,12 @@ def trigger_corporate_sync():
   return jsonify({
       "engine_status": "PROCESSED",
       "dealer_id": "DEAL002905",
-      "total_amount_hit": "1,920,000.00 BDT",
-      "timestamp": datetime.utcnow().isoformat(),
+      "total_amount_hit": "100,050.00 BDT",
+      "timestamp": datetime.now(timezone.utc).isoformat(),
       "corporate_hit_result": sync_result,
   })
 
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0", port=5000, debug=False)
-      
+    
