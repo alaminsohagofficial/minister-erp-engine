@@ -1,6 +1,6 @@
-from datetime import datetime, timezone
 import os
-from flask import Flask, jsonify, request
+from datetime import datetime, timezone
+from flask import Flask, jsonify
 import requests
 
 app = Flask(__name__)
@@ -43,75 +43,75 @@ MINISTER_LEDGER_PAYLOAD = {
 
 @app.route("/", methods=["GET"])
 def home():
-  return jsonify({
-      "service": "Minister & S.R. Electronics Park Secure Ledger Engine",
-      "status": "ONLINE",
-      "dealer_code": "DEAL002905",
-      "endpoints": ["/api/minister/sync", "/api/minister/trigger-sync"],
-  })
+    return jsonify({
+        "service": "Minister & S.R. Electronics Park Secure Ledger Engine",
+        "status": "ONLINE",
+        "dealer_code": "DEAL002905",
+        "endpoints": ["/api/minister/sync", "/api/minister/trigger-sync"],
+    })
 
 
 @app.route("/api/minister/sync", methods=["GET"])
 def get_minister_sync():
-  return jsonify({
-      "status": "API PAYLOAD SYNCED",
-      "dealer_code": "DEAL002905",
-      "client": "MD. AL AMIN SOHAG",
-      "audit_ref": "PUBALI-SYS-AUDIT/2026/21628",
-      "data": MINISTER_LEDGER_PAYLOAD,
-  })
+    return jsonify({
+        "status": "API PAYLOAD SYNCED",
+        "dealer_code": "DEAL002905",
+        "client": "MD. AL AMIN SOHAG",
+        "audit_ref": "PUBALI-SYS-AUDIT/2026/21628",
+        "data": MINISTER_LEDGER_PAYLOAD,
+    })
 
 
 @app.route("/api/minister/trigger-sync", methods=["POST"])
 def trigger_corporate_sync():
-  headers = {
-      "Content-Type": "application/json",
-      "X-Dealer-Authorization": f"Bearer {DEALER_SECURE_TOKEN}",
-  }
-
-  try:
-    response = requests.post(
-        CORPORATE_ERP_WEBHOOK_URL,
-        json=MINISTER_LEDGER_PAYLOAD,
-        headers=headers,
-        timeout=15,
-    )
-
-    try:
-      res_data = response.json()
-    except Exception:
-      res_data = response.text
-
-    if response.status_code == 200:
-      sync_result = {
-          "status": "SUCCESS",
-          "code": response.status_code,
-          "response": res_data,
-      }
-    else:
-      sync_result = {
-          "status": "FAILED",
-          "code": response.status_code,
-          "error_response": res_data,
-          "message": "Corporate ERP Webhook returned an error status.",
-      }
-
-  except requests.exceptions.RequestException as e:
-    sync_result = {
-        "status": "CONNECTION_FAILED",
-        "error_detail": str(e),
-        "message": "Failed to connect to Corporate ERP Webhook server.",
+    headers = {
+        "Content-Type": "application/json",
+        "X-Dealer-Authorization": f"Bearer {DEALER_SECURE_TOKEN}",
     }
 
-  return jsonify({
-      "engine_status": "PROCESSED",
-      "dealer_id": "DEAL002905",
-      "total_amount_hit": "100,050.00 BDT",
-      "timestamp": datetime.now(timezone.utc).isoformat(),
-      "corporate_hit_result": sync_result,
-  })
+    try:
+        response = requests.post(
+            CORPORATE_ERP_WEBHOOK_URL,
+            json=MINISTER_LEDGER_PAYLOAD,
+            headers=headers,
+            timeout=15,
+        )
+
+        try:
+            res_data = response.json()
+        except Exception:
+            res_data = response.text
+
+        if response.status_code == 200:
+            sync_result = {
+                "status": "SUCCESS",
+                "code": response.status_code,
+                "response": res_data,
+            }
+        else:
+            sync_result = {
+                "status": "FAILED",
+                "code": response.status_code,
+                "error_response": res_data,
+                "message": "Corporate ERP Webhook returned an error status.",
+            }
+
+    except requests.exceptions.RequestException as e:
+        sync_result = {
+            "status": "CONNECTION_FAILED",
+            "error_detail": str(e),
+            "message": "Failed to connect to Corporate ERP Webhook server.",
+        }
+
+    return jsonify({
+        "engine_status": "PROCESSED",
+        "dealer_id": "DEAL002905",
+        "total_amount_hit": "100,050.00 BDT",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "corporate_hit_result": sync_result,
+    })
 
 
 if __name__ == "__main__":
-  app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="0.0.0.0", port=5000, debug=False)
     
