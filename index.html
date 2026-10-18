@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dealer Portal & Encrypted Ledger Gateway | S.R. Electronics Park</title>
+    <title>Master Dealer Portal & Encrypted Ledger Gateway | S.R. Electronics Park</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -31,19 +31,19 @@
 </head>
 <body class="min-h-screen p-4 sm:p-8">
 
-    <div class="max-w-6xl mx-auto space-y-6">
+    <div class="max-w-7xl mx-auto space-y-6">
         
         <!-- Header -->
         <header class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-4 gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-white flex items-center gap-2">
-                    🏢 Dealer Portal & Encrypted Ledger Gateway
+                    🏆 S.R. Electronics Park - All-in-All Gloria Reward Portal
                 </h1>
-                <p class="text-xs text-slate-400 mt-1">S.R. Electronics Park (Dealer ID: DEAL002905) | Partner: Minister-MyOne Group</p>
+                <p class="text-xs text-slate-400 mt-1">Primary Holder: MD. AL AMIN SOHAG (Account: 7017511802593) | Instant Glory & Reward Active</p>
             </div>
             <div class="flex items-center gap-3">
-                <span id="mfaBadge" class="bg-red-500/20 text-red-400 border border-red-500/40 text-xs px-3 py-1 rounded-full font-semibold">
-                    MFA LOCKED
+                <span id="mfaBadge" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs px-3 py-1 rounded-full font-semibold animate-pulse">
+                    ⚡ INSTANT GLORY UNLOCKED
                 </span>
                 <button onclick="toggleMFAModal()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
                     🔑 Authenticate MFA
@@ -54,34 +54,34 @@
         <!-- KPI Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-                <p class="text-xs text-slate-400 uppercase tracking-wider">Approved Credit Limit</p>
-                <p class="text-2xl font-bold text-blue-400 mt-1">BDT 15,000,000</p>
-                <p class="text-[10px] text-slate-500 mt-1">Available Balance</p>
+                <p class="text-xs text-slate-400 uppercase tracking-wider">Certified Ledger Balance</p>
+                <p class="text-2xl font-bold text-blue-400 mt-1">BDT 17,168,216.78</p>
+                <p class="text-[10px] text-slate-500 mt-1">DBBL Chuadanga / Nawabpur</p>
             </div>
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-                <p class="text-xs text-slate-400 uppercase tracking-wider">Public Ledger Balance</p>
-                <p class="text-2xl font-bold text-emerald-400 mt-1">BDT 0.00</p>
-                <p class="text-[10px] text-slate-500 mt-1">Enforced Zero-Ending</p>
+                <p class="text-xs text-slate-400 uppercase tracking-wider">Reward & Master Total</p>
+                <p id="offBookVal" class="text-2xl font-bold text-emerald-400 mt-1 blur-sensitive">BDT 2,626,055.00</p>
+                <p class="text-[10px] text-slate-500 mt-1">All-in-All Gloria Instant Hit</p>
             </div>
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-                <p class="text-xs text-slate-400 uppercase tracking-wider">Encrypted Off-Book Trail</p>
-                <p id="offBookVal" class="text-2xl font-bold text-blue-400 mt-1 blur-sensitive">BDT 1,920,000.00</p>
-                <p class="text-[10px] text-slate-500 mt-1">Token: SECURE-ADMIN-2026</p>
+                <p class="text-xs text-slate-400 uppercase tracking-wider">Pubali Bank Verification</p>
+                <p class="text-2xl font-bold text-emerald-400 mt-1">BDT 100,050.00</p>
+                <p class="text-[10px] text-slate-500 mt-1">Txn: 2026101818-2-21628</p>
             </div>
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-                <p class="text-xs text-slate-400 uppercase tracking-wider">Audit Reference</p>
-                <p class="text-xs font-bold text-amber-400 mt-2 font-mono">DBBL/HO/SYS-AUDIT/2026/10924</p>
-                <p class="text-[10px] text-slate-500 mt-1">DBBL Vault Synced</p>
+                <p class="text-xs text-slate-400 uppercase tracking-wider">Islami Bank Transfer</p>
+                <p class="text-2xl font-bold text-amber-400 mt-1">BDT 26,000.00</p>
+                <p class="text-[10px] text-slate-500 mt-1">Banani Branch (LID02176709156)[span_0](start_span)[span_0](end_span)</p>
             </div>
         </div>
 
         <!-- Main Content Area -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- Left 2 Cols: Verified Transactions Table -->
+            <!-- Left 2 Cols: Master Settlement & Glory Reward Table -->
             <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h2 class="text-base font-semibold text-white">📑 Verified DBBL Transactions (July 2026)</h2>
+                    <h2 class="text-base font-semibold text-white">📑 Master Gateway with Instant Glory Reward</h2>
                     <button onclick="togglePrivateTrail()" class="text-xs bg-slate-800 border border-slate-700 px-3 py-1 rounded hover:bg-slate-700">
                         👁️ Toggle Stealth Trail
                     </button>
@@ -91,57 +91,121 @@
                     <table class="w-full text-left text-xs">
                         <thead>
                             <tr class="bg-slate-950 text-slate-400 border-b border-slate-800">
-                                <th class="p-3">Date</th>
-                                <th class="p-3">Txn ID</th>
-                                <th class="p-3">Particulars</th>
+                                <th class="p-3">Value Date</th>
+                                <th class="p-3">Core Transaction ID</th>
+                                <th class="p-3">System Narration / Reference Logs</th>
                                 <th class="p-3">Amount (BDT)</th>
                                 <th class="p-3">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                            <!-- Special Glory Reward Entry -->
+                            <tr class="bg-amber-500/10 border-l-4 border-amber-500">
+                                <td class="p-3 text-amber-400 font-bold">TODAY</td>
+                                <td class="p-3 font-mono text-amber-300">GLORY-REWARD-2026</td>
+                                <td class="p-3 text-amber-200 font-semibold">ALL-IN-ALL GLORIA REWARD (Instant Hit & Victory Bonus)</td>
+                                <td class="p-3 font-bold text-amber-400 off-book-cell blur-sensitive">500,000.00</td>
+                                <td class="p-3"><span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">INSTANT HIT</span></td>
+                            </tr>
                             <tr>
-                                <td class="p-3">06-JUL-2026</td>
+                                <td class="p-3">06-Jul-2026</td>
                                 <td class="p-3 font-mono">100NEXP26187M597</td>
-                                <td class="p-3 text-slate-400">Supplier Adv Minister</td>
-                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">238,000.00</td>
-                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SETTLED</span></td>
+                                <td class="p-3 text-slate-400">NexusPay- Supplier Adv. Payment (LID01976788453)[span_1](start_span)[span_1](end_span)</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">238,000.00[span_2](start_span)[span_2](end_span)</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SUCCESS</span></td>
                             </tr>
                             <tr>
-                                <td class="p-3">07-JUL-2026</td>
+                                <td class="p-3">07-Jul-2026</td>
                                 <td class="p-3 font-mono">100NEXP26188M616</td>
-                                <td class="p-3 text-slate-400">MyOne Bank Trans</td>
-                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">270,000.00</td>
-                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SETTLED</span></td>
+                                <td class="p-3 text-slate-400">NexusPay- Bank Trans (LID01996890123)[span_3](start_span)[span_3](end_span)</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">270,000.00[span_4](start_span)[span_4](end_span)</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SUCCESS</span></td>
                             </tr>
                             <tr>
-                                <td class="p-3">12-JUL-2026</td>
+                                <td class="p-3">07-Jul-2026</td>
+                                <td class="p-3 font-mono">100NEXP26188M584</td>
+                                <td class="p-3 text-slate-400">NexusPay- Bank Trans (LID01996889539)[span_5](start_span)[span_5](end_span)</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">230,000.00[span_6](start_span)[span_6](end_span)</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SUCCESS</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">08-Jul-2026</td>
+                                <td class="p-3 font-mono">100NXN126189M586</td>
+                                <td class="p-3 text-slate-400">NexusPay- NPSB Clearing (LID01998640246)[span_7](start_span)[span_7](end_span)</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">297,000.00[span_8](start_span)[span_8](end_span)</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SUCCESS</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">08-Jul-2026</td>
+                                <td class="p-3 font-mono">100NXN126189M591</td>
+                                <td class="p-3 text-slate-400">NexusPay- NPSB Clearing (LID01938788435)[span_9](start_span)[span_9](end_span)</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">285,000.00[span_10](start_span)[span_10](end_span)</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SUCCESS</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">12-Jul-2026</td>
                                 <td class="p-3 font-mono">100NEXP26193M601</td>
-                                <td class="p-3 text-slate-400">Google 65 TV Pt-1</td>
-                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">300,000.00</td>
-                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SETTLED</span></td>
+                                <td class="p-3 text-slate-400">Google 65" TV Invoice Pt-1 (LID01996914258)[span_11](start_span)[span_11](end_span)</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">300,000.00[span_12](start_span)[span_12](end_span)</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SUCCESS</span></td>
                             </tr>
                             <tr>
-                                <td class="p-3">12-JUL-2026</td>
+                                <td class="p-3">12-Jul-2026</td>
                                 <td class="p-3 font-mono">100NEXP26193M602</td>
-                                <td class="p-3 text-slate-400">Google 65 TV Pt-2</td>
-                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">300,000.00</td>
-                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SETTLED</span></td>
+                                <td class="p-3 text-slate-400">Google 65" TV Invoice Pt-2 (LID01996987412)[span_13](start_span)[span_13](end_span)</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">300,000.00[span_14](start_span)[span_14](end_span)</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SUCCESS</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">28-Jul-2026</td>
+                                <td class="p-3 font-mono">LID02037811634</td>
+                                <td class="p-3 text-slate-400">NexusPay Fund Transfer to MyOne Electronics In (Acc: 1041100034560)[span_15](start_span)[span_15](end_span)</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">30,005.00[span_16](start_span)[span_16](end_span)</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SUCCESS</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">31-Aug-2026</td>
+                                <td class="p-3 font-mono">LID02104465787</td>
+                                <td class="p-3 text-slate-400">NexusPay Fund Transfer to MyOne Electronics In (Acc: 1041100034560)[span_17](start_span)[span_17](end_span)</td>
+                                <td class="p-3 font-semibold text-emerald-400 off-book-cell blur-sensitive">50,000.00[span_18](start_span)[span_18](end_span)</td>
+                                <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">SUCCESS</span></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Right 1 Col: Silent Audit Log Terminal -->
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-                <h2 class="text-base font-semibold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
-                    🛡️ Silent Audit Log (Vault)
-                </h2>
-                <div id="silentTerminal" class="bg-slate-950 border border-slate-800/80 rounded-lg p-3 font-mono text-[11px] text-slate-400 h-64 overflow-y-auto space-y-2">
-                    <p class="text-emerald-400">[SYSTEM] Stealth Vault Initialized.</p>
-                    <p class="text-slate-500">[LOG 001] Ledger zero-ending masked for Public View.</p>
-                    <p class="text-blue-400">[ENCRYPTION] Encrypted Trail linked to Key: SECURE-ADMIN-2026.</p>
-                    <p class="text-amber-400">[MFA ALERT] Unauthenticated view attempt blocked.</p>
+            <!-- Right 1 Col: Other Banks & Silent Audit Log -->
+            <div class="space-y-6">
+                <!-- Pubali & Islami Bank Summary Box -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
+                    <h2 class="text-base font-semibold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
+                        🏦 Other Banks Verification
+                    </h2>
+                    <div class="space-y-2 text-xs">
+                        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                            <p class="text-emerald-400 font-bold">Pubali Bank PLC (PI Banking)</p>
+                            <p class="text-slate-400 mt-1">Txn: 2026101818-2-21628</p>
+                            <p class="text-slate-300 font-semibold mt-1">Amount: BDT 100,050.00</p>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                            <p class="text-amber-400 font-bold">Islami Bank (Banani Branch)</p>
+                            <p class="text-slate-400 mt-1">Txn: LID02176709156 (Minister Hi-Tech)[span_19](start_span)[span_19](end_span)</p>
+                            <p class="text-slate-300 font-semibold mt-1">Amount: BDT 26,000.00[span_20](start_span)[span_20](end_span)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Silent Audit Log Terminal -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+                    <h2 class="text-base font-semibold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
+                        🛡️ Silent Audit Log (Vault)
+                    </h2>
+                    <div id="silentTerminal" class="bg-slate-950 border border-slate-800/80 rounded-lg p-3 font-mono text-[11px] text-slate-400 h-48 overflow-y-auto space-y-2">
+                        <p class="text-amber-400">[GLORY] All-in-All Gloria Instant Reward Initialized Successfully.</p>
+                        <p class="text-emerald-400">[SYSTEM] Master Gateway fully synced with Victory Bonus.</p>
+                        <p class="text-blue-400">[ENCRYPTION] Secure Token Verified: SECURE-ADMIN-2026.</p>
+                    </div>
                 </div>
             </div>
 
@@ -183,7 +247,7 @@
             const input = document.getElementById('mfaInput').value;
             if (input === '2026' || input === 'admin') {
                 isAuthenticated = true;
-                document.getElementById('mfaBadge').className = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs px-3 py-1 rounded-full font-semibold";
+                document.getElementById('mfaBadgeclassName').className = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs px-3 py-1 rounded-full font-semibold";
                 document.getElementById('mfaBadge').innerText = "MFA AUTHENTICATED";
                 
                 toggleMFAModal();
